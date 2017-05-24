@@ -1,0 +1,2 @@
+&6Welcome to the server!
+&2This is an example chat-motd.txt file, you can change the contents of this file, change the path that will be used to load the Chat MOTD in the config.yml, or leave the chat-motd-file option in the config blank to not show a Chat MOTD.

@@ -1,0 +1,2 @@
+# The file that stores the MOTD that is displayed at the top of the chat screen on login
+chat-motd-file: chat-motd.txt
