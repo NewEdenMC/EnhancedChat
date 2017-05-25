@@ -34,11 +34,12 @@ public class EnhancedChat {
 
     public static BaseComponent[] safeGetFormattedFile(String filePath) throws InvalidPathException, IOException {
         List<String> lines = Files.readAllLines(evalPath(filePath), StandardCharsets.UTF_8);
-        StringBuffer string = new StringBuffer();
+        StringBuffer sb = new StringBuffer();
         for (String line : lines) {
-            string.append(line + '\n');
+            sb.append(line + '\n');
         }
-        String formatted = ChatColor.translateAlternateColorCodes('&', string.toString());
+        String string = sb.toString().substring(0, sb.length() - 2);
+        String formatted = ChatColor.translateAlternateColorCodes('&', string);
         return TextComponent.fromLegacyText(formatted);
     }
 
