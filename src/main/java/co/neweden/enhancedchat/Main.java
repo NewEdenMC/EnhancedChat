@@ -21,17 +21,13 @@ public class Main extends Plugin {
     }
 
     private void load() {
-        boolean copyAll = false;
-        if (!getDataFolder().exists()) {
-            getDataFolder().mkdir();
-            copyAll = true;
-        }
-
+        EnhancedChat.formattedChat.clear();
         try {
+            if (!getDataFolder().exists()) {
+                getDataFolder().mkdir();
+                setupDefaultFile("chat-motd.txt");
+            }
             config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(setupDefaultFile("config.yml"));
-            if (!copyAll) return;
-
-            setupDefaultFile("chat-motd.txt");
         } catch (IOException e) {
             getLogger().log(Level.SEVERE, e.getMessage(), e);
         }

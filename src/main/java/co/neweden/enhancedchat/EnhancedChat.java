@@ -11,12 +11,15 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class EnhancedChat {
 
     protected static Main plugin;
+    protected static Map<String, BaseComponent[]> formattedChat = new HashMap<>();
 
     public static Main getPlugin() { return plugin; }
 
@@ -33,14 +36,21 @@ public class EnhancedChat {
     }
 
     public static BaseComponent[] safeGetFormattedFile(String filePath) throws InvalidPathException, IOException {
+        if (formattedChat.containsKey(filePath))
+            return formattedChat.get(filePath);
+
         List<String> lines = Files.readAllLines(evalPath(filePath), StandardCharsets.UTF_8);
         StringBuffer sb = new StringBuffer();
         for (String line : lines) {
             sb.append(line + '\n');
         }
+
         String string = sb.toString().substring(0, sb.length() - 2);
         String formatted = ChatColor.translateAlternateColorCodes('&', string);
-        return TextComponent.fromLegacyText(formatted);
+        BaseComponent[] bc =  TextComponent.fromLegacyText(formatted);
+        formattedChat.put(filePath, bc);
+
+        return bc;
     }
 
 }
