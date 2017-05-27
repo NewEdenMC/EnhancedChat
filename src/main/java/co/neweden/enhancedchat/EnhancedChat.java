@@ -1,7 +1,9 @@
 package co.neweden.enhancedchat;
 
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 
 import java.io.File;
@@ -14,6 +16,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class EnhancedChat {
@@ -51,6 +54,18 @@ public class EnhancedChat {
         formattedChat.put(filePath, bc);
 
         return bc;
+    }
+
+    public static boolean sendMessageFromPath(CommandSender sender, String path, String errorMessage) {
+        if (path.isEmpty()) return false;
+        try {
+            sender.sendMessage(EnhancedChat.safeGetFormattedFile(path));
+            return true;
+        } catch (Exception e) {
+            EnhancedChat.getLogger().log(Level.WARNING, e.getMessage(), e);
+            sender.sendMessage(new ComponentBuilder(errorMessage).color(ChatColor.RED).create());
+            return false;
+        }
     }
 
 }

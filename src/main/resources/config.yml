@@ -1,2 +1,12 @@
 # The file that stores the MOTD that is displayed at the top of the chat screen on login
 chat-motd-file: chat-motd.txt
+
+commands:
+  /colours:
+    file: cmd/colours.txt
+    aliases:
+    - /colour
+    - /colors
+    - /color
+  /ping:
+    file: cmd/ping.txt
