@@ -19,8 +19,12 @@ public class Main extends Plugin {
     public void onEnable() {
         EnhancedChat.plugin = this;
         load();
-        new Messages();
-        loadCommands();
+    }
+
+    public void reload() {
+        getProxy().getPluginManager().unregisterCommands(this);
+        getProxy().getPluginManager().unregisterListeners(this);
+        load();
     }
 
     private void load() {
@@ -38,9 +42,11 @@ public class Main extends Plugin {
         } catch (IOException e) {
             getLogger().log(Level.SEVERE, e.getMessage(), e);
         }
+        new Messages(); new Commands();
+        loadDynamicCommands();
     }
 
-    private void loadCommands() {
+    private void loadDynamicCommands() {
         for (String key : getConfig().getSection("commands").getKeys()) {
             String command = stripCommandSlash(key);
             String fileName = getConfig().getString("commands." + key + ".file", "");
