@@ -48,7 +48,7 @@ public class EnhancedChat {
             sb.append(line + '\n');
         }
 
-        String string = sb.toString().substring(0, sb.length() - 2);
+        String string = sb.toString().substring(0, sb.length() - 1);
         String formatted = ChatColor.translateAlternateColorCodes('&', string);
         BaseComponent[] bc =  TextComponent.fromLegacyText(formatted);
         formattedChat.put(filePath, bc);
