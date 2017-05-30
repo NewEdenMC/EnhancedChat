@@ -2,6 +2,7 @@ package co.neweden.enhancedchat;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -22,7 +23,7 @@ import java.util.logging.Logger;
 public class EnhancedChat {
 
     protected static Main plugin;
-    protected static Map<String, BaseComponent[]> formattedChat = new HashMap<>();
+    protected static Map<String, TextComponent> formattedChat = new HashMap<>();
 
     public static Main getPlugin() { return plugin; }
 
@@ -38,7 +39,21 @@ public class EnhancedChat {
         return Paths.get(getPlugin().getDataFolder().getPath() + File.separator + path);
     }
 
-    public static BaseComponent[] safeGetFormattedFile(String filePath) throws InvalidPathException, IOException {
+    public static TextComponent evalMessage(String message) { return evalMessage(message, null); }
+    public static TextComponent evalMessage(String message, Map<String, String> extraTokens) {
+        Map<String, String> tokens = new HashMap<>();
+        tokens.put("%onlinePlayerCount%", String.valueOf(ProxyServer.getInstance().getOnlineCount()));
+        if (extraTokens != null)
+            tokens.putAll(extraTokens);
+
+        for (Map.Entry<String, String> token : tokens.entrySet()) {
+            message = message.replaceAll(token.getKey(), token.getValue());
+        }
+
+        return new TextComponent(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', message)));
+    }
+
+    public static TextComponent safeGetFormattedFile(String filePath) throws InvalidPathException, IOException {
         if (formattedChat.containsKey(filePath))
             return formattedChat.get(filePath);
 
@@ -49,11 +64,10 @@ public class EnhancedChat {
         }
 
         String string = sb.toString().substring(0, sb.length() - 1);
-        String formatted = ChatColor.translateAlternateColorCodes('&', string);
-        BaseComponent[] bc =  TextComponent.fromLegacyText(formatted);
-        formattedChat.put(filePath, bc);
+        TextComponent tc = evalMessage(string);
+        formattedChat.put(filePath, tc);
 
-        return bc;
+        return tc;
     }
 
     public static boolean sendMessageFromPath(CommandSender sender, String path, String errorMessage) {
