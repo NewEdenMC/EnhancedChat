@@ -46,9 +46,7 @@ public class EnhancedChat {
         if (extraTokens != null)
             tokens.putAll(extraTokens);
 
-        for (Map.Entry<String, String> token : tokens.entrySet()) {
-            message = message.replaceAll(token.getKey(), token.getValue());
-        }
+        message = new StringEval(message, tokens).toString();
 
         return new TextComponent(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', message)));
     }
