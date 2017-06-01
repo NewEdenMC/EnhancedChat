@@ -1,5 +1,8 @@
 package co.neweden.enhancedchat;
 
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+
 import java.util.Map;
 
 /**
@@ -8,12 +11,14 @@ import java.util.Map;
  */
 public class StringEval {
 
-    private StringBuilder output = new StringBuilder();
+    private ComponentBuilder componentBuilder = new ComponentBuilder("");
+    private StringBuilder segment = new StringBuilder();
     private StringBuilder token = new StringBuilder();
     private char[] chars;
     private Map<String, String> tokens;
     private int tokenStart = 0;
     private enum Action { CONTINUE, NEXT }
+    private ChatColor colourCode;
 
     protected StringEval() { }
 
@@ -28,13 +33,21 @@ public class StringEval {
 
             // Evaluate for colour codes
             if (chars[i] == '&' && "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(chars[i + 1]) >= 0) {
-                chars[i] = 167;
-                chars[i + 1] = Character.toLowerCase(chars[i + 1]);
+                i++;
+                nextSegment();
+                colourCode = ChatColor.getByChar(chars[i]);
+                continue;
             }
 
-            output.append(chars[i]);
+            segment.append(chars[i]);
         }
+        nextSegment();
 
+    }
+
+    private void nextSegment() {
+        componentBuilder.append(segment.toString()).color(colourCode);
+        segment.setLength(0);
     }
 
     /**
@@ -58,7 +71,7 @@ public class StringEval {
         if (tokenStart != 0 && chars[i] == '%') {
             // token end detected, if token exists append value otherwise append raw token, reset, continue to next char
             String ct = token.toString() + '%';
-            output.append(tokens.getOrDefault(ct, ct));
+            segment.append(tokens.getOrDefault(ct, ct));
             tokenStart = 0; token.setLength(0);
             return Action.CONTINUE;
         }
@@ -67,9 +80,11 @@ public class StringEval {
         return Action.NEXT;
     }
 
+    public ComponentBuilder getComponentBuilder() { return componentBuilder; }
+
     @Override
     public String toString() {
-        return output.toString();
+        return componentBuilder.toString();
     }
 
 }

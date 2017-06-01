@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 public class EnhancedChat {
 
     protected static Main plugin;
-    protected static Map<String, TextComponent> formattedChat = new HashMap<>();
+    protected static Map<String, StringEval> formattedChat = new HashMap<>();
 
     public static Main getPlugin() { return plugin; }
 
@@ -39,19 +39,17 @@ public class EnhancedChat {
         return Paths.get(getPlugin().getDataFolder().getPath() + File.separator + path);
     }
 
-    public static TextComponent evalMessage(String message) { return evalMessage(message, null); }
-    public static TextComponent evalMessage(String message, Map<String, String> extraTokens) {
+    public static StringEval evalMessage(String message) { return evalMessage(message, null); }
+    public static StringEval evalMessage(String message, Map<String, String> extraTokens) {
         Map<String, String> tokens = new HashMap<>();
         tokens.put("%onlinePlayerCount%", String.valueOf(ProxyServer.getInstance().getOnlineCount()));
         if (extraTokens != null)
             tokens.putAll(extraTokens);
 
-        message = new StringEval(message, tokens).toString();
-
-        return new TextComponent(TextComponent.fromLegacyText(message));
+        return new StringEval(message, tokens);
     }
 
-    public static TextComponent safeGetFormattedFile(String filePath) throws InvalidPathException, IOException {
+    public static StringEval safeGetFormattedFile(String filePath) throws InvalidPathException, IOException {
         if (formattedChat.containsKey(filePath))
             return formattedChat.get(filePath);
 
@@ -62,16 +60,16 @@ public class EnhancedChat {
         }
 
         String string = sb.toString().substring(0, sb.length() - 1);
-        TextComponent tc = evalMessage(string);
-        formattedChat.put(filePath, tc);
+        StringEval se = evalMessage(string);
+        formattedChat.put(filePath, se);
 
-        return tc;
+        return se;
     }
 
     public static boolean sendMessageFromPath(CommandSender sender, String path, String errorMessage) {
         if (path.isEmpty()) return false;
         try {
-            sender.sendMessage(EnhancedChat.safeGetFormattedFile(path));
+            sender.sendMessage(EnhancedChat.safeGetFormattedFile(path).getComponentBuilder().create());
             return true;
         } catch (Exception e) {
             EnhancedChat.getLogger().log(Level.WARNING, e.getMessage(), e);

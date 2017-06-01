@@ -30,7 +30,7 @@ public class Messages implements Listener {
             String message = getHighestStatusMessage("join-messages", event.getPlayer());
             Map<String, String> tokens = new HashMap<>();
             tokens.put("%displayName%", event.getPlayer().getDisplayName());
-            ProxyServer.getInstance().broadcast(EnhancedChat.evalMessage(message, tokens));
+            ProxyServer.getInstance().broadcast(EnhancedChat.evalMessage(message, tokens).getComponentBuilder().create());
         }
     }
 
@@ -40,7 +40,7 @@ public class Messages implements Listener {
             String message = getHighestStatusMessage("quit-messages", event.getPlayer());
             Map<String, String> tokens = new HashMap<>();
             tokens.put("%displayName%", event.getPlayer().getDisplayName());
-            ProxyServer.getInstance().broadcast(EnhancedChat.evalMessage(message, tokens));
+            ProxyServer.getInstance().broadcast(EnhancedChat.evalMessage(message, tokens).getComponentBuilder().create());
         }
     }
 
