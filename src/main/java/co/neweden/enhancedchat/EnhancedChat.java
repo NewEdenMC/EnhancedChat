@@ -48,7 +48,7 @@ public class EnhancedChat {
 
         message = new StringEval(message, tokens).toString();
 
-        return new TextComponent(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', message)));
+        return new TextComponent(TextComponent.fromLegacyText(message));
     }
 
     public static TextComponent safeGetFormattedFile(String filePath) throws InvalidPathException, IOException {

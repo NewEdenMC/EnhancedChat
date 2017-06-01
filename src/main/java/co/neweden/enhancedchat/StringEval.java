@@ -22,8 +22,15 @@ public class StringEval {
         this.tokens = tokens;
 
         for (int i = 0; i < chars.length; i++) {
+            // Evaluate for tokens
             if (evalToken(i) == Action.CONTINUE)
                 continue;
+
+            // Evaluate for colour codes
+            if (chars[i] == '&' && "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(chars[i + 1]) >= 0) {
+                chars[i] = 167;
+                chars[i + 1] = Character.toLowerCase(chars[i + 1]);
+            }
 
             output.append(chars[i]);
         }
