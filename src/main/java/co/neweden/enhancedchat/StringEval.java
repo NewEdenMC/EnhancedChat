@@ -1,7 +1,10 @@
 package co.neweden.enhancedchat;
 
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 
 import java.util.Map;
 
@@ -11,7 +14,7 @@ import java.util.Map;
  */
 public class StringEval {
 
-    private ComponentBuilder componentBuilder = new ComponentBuilder("");
+    private TextComponent textComponent = new TextComponent();
     private StringBuilder segment = new StringBuilder();
     private StringBuilder token = new StringBuilder();
     private char[] chars;
@@ -19,6 +22,8 @@ public class StringEval {
     private int tokenStart = 0;
     private enum Action { CONTINUE, NEXT }
     private ChatColor colourCode;
+    private int segmentWordStart = 0;
+    private boolean inURL = false;
 
     protected StringEval() { }
 
@@ -33,11 +38,14 @@ public class StringEval {
 
             // Evaluate for colour codes
             if (chars[i] == '&' && "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(chars[i + 1]) >= 0) {
-                i++;
-                nextSegment();
+                i++; nextSegment();
                 colourCode = ChatColor.getByChar(chars[i]);
                 continue;
             }
+
+            // Evaluate for URLs
+            if (evalURL(i) == Action.CONTINUE)
+                continue;
 
             segment.append(chars[i]);
         }
@@ -46,8 +54,23 @@ public class StringEval {
     }
 
     private void nextSegment() {
-        componentBuilder.append(segment.toString()).color(colourCode);
+        TextComponent tc = new TextComponent(segment.toString());
+        tc.setColor(colourCode);
+        if (inURL) {
+            String rawURL = segment.toString();
+            if (!rawURL.substring(0, 6).equalsIgnoreCase("http://") || !rawURL.substring(0, 7).equalsIgnoreCase("https://"))
+                rawURL = "http://" + rawURL;
+            tc.setUnderlined(true);
+            tc.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, rawURL));
+            tc.setHoverEvent(new HoverEvent(
+                    HoverEvent.Action.SHOW_TEXT,
+                    new ComponentBuilder("Click here to go to ").color(ChatColor.AQUA).append(rawURL).color(ChatColor.YELLOW).create()
+            ));
+            inURL = false;
+        }
+        textComponent.addExtra(tc);
         segment.setLength(0);
+        segmentWordStart = 0;
     }
 
     /**
@@ -80,11 +103,44 @@ public class StringEval {
         return Action.NEXT;
     }
 
-    public ComponentBuilder getComponentBuilder() { return componentBuilder; }
+    private Action evalURL(int i) {
+        String spaceChars = " \t\n\r";
+
+        if (inURL) {
+            if (spaceChars.indexOf(chars[i]) >= 0) {
+                nextSegment();
+                return Action.NEXT;
+            }
+            segment.append(chars[i]);
+            return Action.CONTINUE;
+        }
+
+        if (spaceChars.indexOf(chars[i - 1]) >= 0) {
+            segmentWordStart = segment.length(); // will be the index of the last space
+            return Action.NEXT;
+        } // we need to keep track of where the last space char was
+
+        if (segment.length() < 1 || i + 1 > chars.length - 1)
+            return Action.NEXT; // prevents ArrayIndexOutOfBounds Exceptions
+
+        if (spaceChars.indexOf(chars[i - 1]) >= 0 || chars[i] != '.' || spaceChars.indexOf(chars[i + 1]) >= 0)
+            return Action.NEXT; // we are not in a URL as the chars around position i are space chars and char at i is not a dot
+
+        char[] firstPart = new char[segment.length() - segmentWordStart];
+        segment.getChars(segmentWordStart, segment.length(), firstPart, 0);
+        segment.setLength(segment.length() - (segment.length() - segmentWordStart));
+        nextSegment();
+        segment.append(firstPart).append('.');
+        inURL = true;
+
+        return Action.CONTINUE;
+    }
+
+    public TextComponent getTextComponent() { return textComponent; }
 
     @Override
     public String toString() {
-        return componentBuilder.toString();
+        return textComponent.toString();
     }
 
 }

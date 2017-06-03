@@ -1,8 +1,6 @@
 package co.neweden.enhancedchat;
 
-import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
@@ -10,7 +8,6 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.event.EventHandler;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +27,7 @@ public class Messages implements Listener {
             String message = getHighestStatusMessage("join-messages", event.getPlayer());
             Map<String, String> tokens = new HashMap<>();
             tokens.put("%displayName%", event.getPlayer().getDisplayName());
-            ProxyServer.getInstance().broadcast(EnhancedChat.evalMessage(message, tokens).getComponentBuilder().create());
+            ProxyServer.getInstance().broadcast(EnhancedChat.evalMessage(message, tokens).getTextComponent());
         }
     }
 
@@ -40,7 +37,7 @@ public class Messages implements Listener {
             String message = getHighestStatusMessage("quit-messages", event.getPlayer());
             Map<String, String> tokens = new HashMap<>();
             tokens.put("%displayName%", event.getPlayer().getDisplayName());
-            ProxyServer.getInstance().broadcast(EnhancedChat.evalMessage(message, tokens).getComponentBuilder().create());
+            ProxyServer.getInstance().broadcast(EnhancedChat.evalMessage(message, tokens).getTextComponent());
         }
     }
 

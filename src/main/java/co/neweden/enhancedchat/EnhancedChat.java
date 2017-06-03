@@ -3,9 +3,7 @@ package co.neweden.enhancedchat;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.TextComponent;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,7 +67,7 @@ public class EnhancedChat {
     public static boolean sendMessageFromPath(CommandSender sender, String path, String errorMessage) {
         if (path.isEmpty()) return false;
         try {
-            sender.sendMessage(EnhancedChat.safeGetFormattedFile(path).getComponentBuilder().create());
+            sender.sendMessage(EnhancedChat.safeGetFormattedFile(path).getTextComponent());
             return true;
         } catch (Exception e) {
             EnhancedChat.getLogger().log(Level.WARNING, e.getMessage(), e);
