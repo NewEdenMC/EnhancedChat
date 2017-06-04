@@ -87,7 +87,7 @@ public class StringEval {
      * to move to the next evaluation
      */
     private Action evalToken(int i) {
-        if (chars[i] == '%' && tokenStart == 0 && !shouldEscape(i)) {
+        if (chars[i] == '%' && tokenStart == 0) {
             // token start detected, save position and char, continue to next char
             tokenStart = i; token.append(chars[i]); return Action.CONTINUE;
         }
@@ -140,10 +140,6 @@ public class StringEval {
         inURL = true;
 
         return Action.CONTINUE;
-    }
-
-    private boolean shouldEscape(int i) {
-        return !(chars[i - 2] == '\\' && chars[i - 1] == '\\') || chars[i - 1] == '\\';
     }
 
     public TextComponent getTextComponent() { return textComponent; }
