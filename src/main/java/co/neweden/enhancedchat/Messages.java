@@ -28,7 +28,7 @@ public class Messages implements Listener {
     @EventHandler
     public void onPostLogin(PostLoginEvent event) {
         if (EnhancedChat.getConfig().getBoolean("chat-motd.enabled", false)) {
-            String chat_motd_file = EnhancedChat.getConfig().getString("chat-motd-file", null);
+            String chat_motd_file = EnhancedChat.getConfig().getString("chat-motd.file", "");
             EnhancedChat.sendMessageFromPath(event.getPlayer(), chat_motd_file, "An error has occurred while trying to load the Chat MOTD File, please inform a member of staff.");
         }
 
