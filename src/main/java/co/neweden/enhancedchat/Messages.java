@@ -101,7 +101,7 @@ public class Messages implements Listener {
                 else
                     autoMessageCounter = 0;
             }
-        }, 0, delay, TimeUnit.SECONDS);
+        }, EnhancedChat.startUpLoad ? delay : 0, delay, TimeUnit.SECONDS);
     }
 
 }

@@ -44,6 +44,7 @@ public class Main extends Plugin {
         }
         new Messages(); new Commands();
         loadDynamicCommands();
+        EnhancedChat.startUpLoad = false;
     }
 
     private void loadDynamicCommands() {

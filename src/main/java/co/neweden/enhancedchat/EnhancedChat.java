@@ -22,6 +22,7 @@ public class EnhancedChat {
 
     protected static Main plugin;
     protected static Map<String, StringEval> formattedChat = new HashMap<>();
+    protected static boolean startUpLoad = true;
 
     public static Main getPlugin() { return plugin; }
 
