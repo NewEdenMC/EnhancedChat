@@ -24,6 +24,7 @@ public class Main extends Plugin {
     public void reload() {
         getProxy().getPluginManager().unregisterCommands(this);
         getProxy().getPluginManager().unregisterListeners(this);
+        getProxy().getScheduler().cancel(this);
         load();
     }
 

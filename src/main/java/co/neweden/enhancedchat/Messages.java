@@ -20,7 +20,6 @@ public class Messages implements Listener {
 
     private int autoMessageCounter;
     private final List<TextComponent> autoMessages = new ArrayList<>();
-    private ScheduledTask autoMessageTask = null;
 
     public Messages() {
         ProxyServer.getInstance().getPluginManager().registerListener(EnhancedChat.getPlugin(), this);
@@ -77,9 +76,6 @@ public class Messages implements Listener {
         if (!EnhancedChat.getPlugin().getConfig().getBoolean("auto_messages.enabled", false))
             return; // If not enabled in the config, don't do anything
 
-        if (autoMessageTask != null)
-            autoMessageTask.cancel();
-
         long delay = EnhancedChat.getPlugin().getConfig().getLong("auto_messages.delay", 600);
         final String prefix = EnhancedChat.getPlugin().getConfig().getString("auto_messages.prefix", "");
 
@@ -92,7 +88,7 @@ public class Messages implements Listener {
         EnhancedChat.getLogger().info("Loaded " + autoMessages.size() + " Auto Messages with a delay of " + delay + " second(s).");
         if (autoMessages.size() <= 0) return;
 
-        autoMessageTask = ProxyServer.getInstance().getScheduler().schedule(EnhancedChat.getPlugin(), new Runnable() {
+        ProxyServer.getInstance().getScheduler().schedule(EnhancedChat.getPlugin(), new Runnable() {
             @Override
             public void run() {
                 ProxyServer.getInstance().broadcast(autoMessages.get(autoMessageCounter));
