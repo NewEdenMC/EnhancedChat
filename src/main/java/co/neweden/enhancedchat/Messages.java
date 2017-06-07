@@ -28,9 +28,10 @@ public class Messages implements Listener {
 
     @EventHandler
     public void onPostLogin(PostLoginEvent event) {
-        String chat_motd_file = EnhancedChat.getPlugin().getConfig().getString("chat-motd-file", null);
-        if (chat_motd_file == null) return;
-        EnhancedChat.sendMessageFromPath(event.getPlayer(), chat_motd_file, "An error has occurred while trying to load the Chat MOTD File, please inform a member of staff.");
+        if (EnhancedChat.getPlugin().getConfig().getBoolean("chat-motd.enabled", false)) {
+            String chat_motd_file = EnhancedChat.getPlugin().getConfig().getString("chat-motd-file", null);
+            EnhancedChat.sendMessageFromPath(event.getPlayer(), chat_motd_file, "An error has occurred while trying to load the Chat MOTD File, please inform a member of staff.");
+        }
 
         if (EnhancedChat.getPlugin().getConfig().getBoolean("join-messages.enabled", false)) {
             String message = getHighestStatusMessage("join-messages", event.getPlayer());

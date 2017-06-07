@@ -1,5 +1,7 @@
 # The file that stores the MOTD that is displayed at the top of the chat screen on login
-chat-motd-file: chat-motd.txt
+chat-motd:
+   enabled: true
+   file: chat-motd.txt
 
 # Customise the message that is displayed when a Player connects to the Proxy
 # You can set different messages per Group
