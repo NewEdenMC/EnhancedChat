@@ -121,13 +121,13 @@ public class StringEval {
             return Action.CONTINUE;
         }
 
+        if (segment.length() < 1 || i + 1 > chars.length - 1)
+            return Action.NEXT; // prevents ArrayIndexOutOfBounds Exceptions
+
         if (spaceChars.indexOf(chars[i - 1]) >= 0) {
             segmentWordStart = segment.length(); // will be the index of the last space
             return Action.NEXT;
         } // we need to keep track of where the last space char was
-
-        if (segment.length() < 1 || i + 1 > chars.length - 1)
-            return Action.NEXT; // prevents ArrayIndexOutOfBounds Exceptions
 
         if (spaceChars.indexOf(chars[i - 1]) >= 0 || chars[i] != '.' || spaceChars.indexOf(chars[i + 1]) >= 0)
             return Action.NEXT; // we are not in a URL as the chars around position i are space chars and char at i is not a dot
