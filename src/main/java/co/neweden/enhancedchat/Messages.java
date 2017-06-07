@@ -1,20 +1,30 @@
 package co.neweden.enhancedchat;
 
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
+import net.md_5.bungee.api.scheduler.ScheduledTask;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.event.EventHandler;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class Messages implements Listener {
 
+    private int autoMessageCounter;
+    private final List<TextComponent> autoMessages = new ArrayList<>();
+    private ScheduledTask autoMessageTask = null;
+
     public Messages() {
         ProxyServer.getInstance().getPluginManager().registerListener(EnhancedChat.getPlugin(), this);
+        startAnnouncements();
     }
 
     @EventHandler
@@ -61,6 +71,37 @@ public class Messages implements Listener {
             return def;
         else
             return configGroups.getString(groupToUse, "");
+    }
+
+    public void startAnnouncements() {
+        if (!EnhancedChat.getPlugin().getConfig().getBoolean("auto_messages.enabled", false))
+            return; // If not enabled in the config, don't do anything
+
+        if (autoMessageTask != null)
+            autoMessageTask.cancel();
+
+        long delay = EnhancedChat.getPlugin().getConfig().getLong("auto_messages.delay", 600);
+        final String prefix = EnhancedChat.getPlugin().getConfig().getString("auto_messages.prefix", "");
+
+        autoMessageCounter = 0;
+        autoMessages.clear();
+        EnhancedChat.getPlugin().getConfig().getStringList("auto_messages.messages").forEach(msg -> {
+            autoMessages.add(new StringEval(prefix + msg, new HashMap<>()).getTextComponent());
+        });
+
+        EnhancedChat.getLogger().info("Loaded " + autoMessages.size() + " Auto Messages with a delay of " + delay + " second(s).");
+        if (autoMessages.size() <= 0) return;
+
+        autoMessageTask = ProxyServer.getInstance().getScheduler().schedule(EnhancedChat.getPlugin(), new Runnable() {
+            @Override
+            public void run() {
+                ProxyServer.getInstance().broadcast(autoMessages.get(autoMessageCounter));
+                if (autoMessageCounter < autoMessages.size() - 1)
+                    autoMessageCounter++;
+                else
+                    autoMessageCounter = 0;
+            }
+        }, 0, delay, TimeUnit.SECONDS);
     }
 
 }

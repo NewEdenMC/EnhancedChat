@@ -15,6 +15,17 @@ quit-messages:
   enabled: true
   default: '&f[&c-&f] &c%displayName% &fhas joined'
 
+# Messages can be broadcast in chat on a loop
+auto_messages:
+  enabled: false
+  delay: 600 # delay between messages in seconds
+  prefix: '&dAnnouncement&f: &c'
+  messages:
+  - 'This is an auto message'
+  - 'This is another auto message &awith different formatting'
+  - '&eYou can add as many of these as you like and Bungee will keep broadcasting them at the delay you set'
+  - '&bYou can use some tokens in these as well, £2the number of players online is %onlinePlayerCount%'
+
 commands:
   /colours:
     file: cmd/colours.txt
