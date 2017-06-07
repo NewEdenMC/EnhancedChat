@@ -28,12 +28,12 @@ public class Messages implements Listener {
 
     @EventHandler
     public void onPostLogin(PostLoginEvent event) {
-        if (EnhancedChat.getPlugin().getConfig().getBoolean("chat-motd.enabled", false)) {
-            String chat_motd_file = EnhancedChat.getPlugin().getConfig().getString("chat-motd-file", null);
+        if (EnhancedChat.getConfig().getBoolean("chat-motd.enabled", false)) {
+            String chat_motd_file = EnhancedChat.getConfig().getString("chat-motd-file", null);
             EnhancedChat.sendMessageFromPath(event.getPlayer(), chat_motd_file, "An error has occurred while trying to load the Chat MOTD File, please inform a member of staff.");
         }
 
-        if (EnhancedChat.getPlugin().getConfig().getBoolean("join-messages.enabled", false)) {
+        if (EnhancedChat.getConfig().getBoolean("join-messages.enabled", false)) {
             String message = getHighestStatusMessage("join-messages", event.getPlayer());
             Map<String, String> tokens = new HashMap<>();
             tokens.put("%displayName%", event.getPlayer().getDisplayName());
@@ -43,7 +43,7 @@ public class Messages implements Listener {
 
     @EventHandler
     public void onPlayerDisconnect(PlayerDisconnectEvent event) {
-        if (EnhancedChat.getPlugin().getConfig().getBoolean("quit-messages.enabled", false)) {
+        if (EnhancedChat.getConfig().getBoolean("quit-messages.enabled", false)) {
             String message = getHighestStatusMessage("quit-messages", event.getPlayer());
             Map<String, String> tokens = new HashMap<>();
             tokens.put("%displayName%", event.getPlayer().getDisplayName());
@@ -52,8 +52,8 @@ public class Messages implements Listener {
     }
 
     private String getHighestStatusMessage(String configSection, ProxiedPlayer player) {
-        Configuration configGroups = EnhancedChat.getPlugin().getConfig().getSection(configSection + ".groups");
-        String def = EnhancedChat.getPlugin().getConfig().getString(configSection + ".default", "");
+        Configuration configGroups = EnhancedChat.getConfig().getSection(configSection + ".groups");
+        String def = EnhancedChat.getConfig().getString(configSection + ".default", "");
 
         if (configGroups.getKeys().size() == 0)
             return def;
@@ -74,15 +74,15 @@ public class Messages implements Listener {
     }
 
     public void startAnnouncements() {
-        if (!EnhancedChat.getPlugin().getConfig().getBoolean("auto_messages.enabled", false))
+        if (!EnhancedChat.getConfig().getBoolean("auto_messages.enabled", false))
             return; // If not enabled in the config, don't do anything
 
-        long delay = EnhancedChat.getPlugin().getConfig().getLong("auto_messages.delay", 600);
-        final String prefix = EnhancedChat.getPlugin().getConfig().getString("auto_messages.prefix", "");
+        long delay = EnhancedChat.getConfig().getLong("auto_messages.delay", 600);
+        final String prefix = EnhancedChat.getConfig().getString("auto_messages.prefix", "");
 
         autoMessageCounter = 0;
         autoMessages.clear();
-        EnhancedChat.getPlugin().getConfig().getStringList("auto_messages.messages").forEach(msg -> {
+        EnhancedChat.getConfig().getStringList("auto_messages.messages").forEach(msg -> {
             autoMessages.add(new StringEval(prefix + msg, new HashMap<>()).getTextComponent());
         });
 
