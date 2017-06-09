@@ -1,4 +1,4 @@
-name: EnhancedChat
+name: ${artifactId}
+version: ${version}
 main: co.neweden.enhancedchat.Main
 author: AaronMcH
-version: 0.1-SNAPSHOT
