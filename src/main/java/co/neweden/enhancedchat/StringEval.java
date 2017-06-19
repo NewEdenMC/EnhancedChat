@@ -32,9 +32,7 @@ public class StringEval {
     private boolean evalURLs = true;
     private boolean underlineURLs = true;
 
-    protected StringEval() { }
-
-    protected StringEval(String string, Map<String, String> tokens) {
+    public StringEval(String string, Map<String, String> tokens) {
         stringToEval = string;
         this.tokens = tokens;
     }
