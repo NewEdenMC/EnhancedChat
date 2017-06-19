@@ -134,7 +134,7 @@ public class StringEval {
     }
 
     private Action evalURL(int i) {
-        if (!underlineURLs) return Action.NEXT;
+        if (!evalURLs) return Action.NEXT;
 
         String spaceChars = " \t\n\r";
 
