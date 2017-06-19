@@ -14,7 +14,8 @@ import java.util.Map;
  */
 public class StringEval {
 
-    private TextComponent textComponent = new TextComponent();
+    private String stringToEval;
+    private TextComponent textComponent;
     private StringBuilder segment = new StringBuilder();
     private StringBuilder token = new StringBuilder();
     private char[] chars;
@@ -25,15 +26,32 @@ public class StringEval {
     private int segmentWordStart = 0;
     private boolean inURL = false;
 
+    private boolean stripFormatting = false;
+    private boolean noEscape = false;
+
+    private boolean evalURLs = true;
+    private boolean underlineURLs = true;
+
     protected StringEval() { }
 
     protected StringEval(String string, Map<String, String> tokens) {
-        chars = string.toCharArray();
+        stringToEval = string;
         this.tokens = tokens;
+    }
+
+    public StringEval stripFormatting() { stripFormatting = true; return this; }
+
+    public StringEval noEscapeBackslash() { noEscape = true; return this; }
+
+    public StringEval urlEval(boolean enabled, boolean underlined) { evalURLs = enabled; underlineURLs = underlined; return this; }
+
+    private void eval() {
+        textComponent = new TextComponent();
+        chars = stringToEval.toCharArray();
 
         for (int i = 0; i < chars.length; i++) {
             // Double black-slash escape
-            if (chars[i] == '\\' && i + 1 < chars.length && "%&\\".indexOf(chars[i + 1]) >= 0) {
+            if (!noEscape && chars[i] == '\\' && i + 1 < chars.length && "%&\\".indexOf(chars[i + 1]) >= 0) {
                 segment.append(chars[i + 1]);
                 i++; continue;
             }
@@ -43,10 +61,16 @@ public class StringEval {
                 continue;
 
             // Evaluate for colour codes
-            if (chars[i] == '&' && "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(chars[i + 1]) >= 0) {
-                i++; nextSegment();
-                colourCode = ChatColor.getByChar(chars[i]);
-                continue;
+            if (stripFormatting) {
+                if (chars[i] == '\u00A7')
+                    continue;
+            } else {
+                if (chars[i] == '&' && "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(chars[i + 1]) >= 0) {
+                    i++;
+                    nextSegment();
+                    colourCode = ChatColor.getByChar(chars[i]);
+                    continue;
+                }
             }
 
             // Evaluate for URLs
@@ -66,7 +90,7 @@ public class StringEval {
             String rawURL = segment.toString();
             if (!rawURL.substring(0, 6).equalsIgnoreCase("http://") || !rawURL.substring(0, 7).equalsIgnoreCase("https://"))
                 rawURL = "http://" + rawURL;
-            tc.setUnderlined(true);
+            tc.setUnderlined(underlineURLs);
             tc.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, rawURL));
             tc.setHoverEvent(new HoverEvent(
                     HoverEvent.Action.SHOW_TEXT,
@@ -87,6 +111,8 @@ public class StringEval {
      * to move to the next evaluation
      */
     private Action evalToken(int i) {
+        if (tokens.isEmpty()) return Action.NEXT;
+
         if (chars[i] == '%' && tokenStart == 0) {
             // token start detected, save position and char, continue to next char
             tokenStart = i; token.append(chars[i]); return Action.CONTINUE;
@@ -110,6 +136,8 @@ public class StringEval {
     }
 
     private Action evalURL(int i) {
+        if (!underlineURLs) return Action.NEXT;
+
         String spaceChars = " \t\n\r";
 
         if (inURL) {
@@ -142,11 +170,12 @@ public class StringEval {
         return Action.CONTINUE;
     }
 
-    public TextComponent getTextComponent() { return textComponent; }
+    public TextComponent getTextComponent() {
+        if (textComponent == null) eval();
+        return textComponent;
+    }
 
     @Override
-    public String toString() {
-        return textComponent.toString();
-    }
+    public String toString() { return getTextComponent().toString(); }
 
 }
