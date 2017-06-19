@@ -48,7 +48,7 @@ public class EnhancedChat {
         if (extraTokens != null)
             tokens.putAll(extraTokens);
 
-        return new StringEval(message, tokens);
+        return new StringEval(message).addTokens(tokens);
     }
 
     public static StringEval safeGetFormattedFile(String filePath) throws InvalidPathException, IOException {

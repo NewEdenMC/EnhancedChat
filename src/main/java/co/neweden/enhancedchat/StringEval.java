@@ -6,6 +6,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -19,7 +20,7 @@ public class StringEval {
     private StringBuilder segment = new StringBuilder();
     private StringBuilder token = new StringBuilder();
     private char[] chars;
-    private Map<String, String> tokens;
+    private Map<String, String> tokens = new HashMap<>();
     private int tokenStart = 0;
     private enum Action { CONTINUE, NEXT }
     private ChatColor colourCode;
@@ -32,10 +33,9 @@ public class StringEval {
     private boolean evalURLs = true;
     private boolean underlineURLs = true;
 
-    public StringEval(String string, Map<String, String> tokens) {
-        stringToEval = string;
-        this.tokens = tokens;
-    }
+    public StringEval(String string) { stringToEval = string; }
+
+    public StringEval addTokens(Map<String, String> tokens) { this.tokens.putAll(tokens); return this;}
 
     public StringEval stripFormatting() { stripFormatting = true; return this; }
 

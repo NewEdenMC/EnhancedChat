@@ -82,7 +82,7 @@ public class Messages implements Listener {
         autoMessageCounter = 0;
         autoMessages.clear();
         EnhancedChat.getConfig().getStringList("auto_messages.messages").forEach(msg -> {
-            autoMessages.add(new StringEval(prefix + msg, new HashMap<>()).getTextComponent());
+            autoMessages.add(new StringEval(prefix + msg).getTextComponent());
         });
 
         EnhancedChat.getLogger().info("Loaded " + autoMessages.size() + " Auto Messages with a delay of " + delay + " second(s).");
