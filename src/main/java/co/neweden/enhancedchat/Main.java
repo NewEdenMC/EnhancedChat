@@ -25,7 +25,8 @@ public class Main extends Plugin {
 
     @Override
     public void onDisable() {
-        discordChatRelay.getDiscordBotWrapper().unload();
+        if (discordChatRelay.getDiscordBotWrapper() != null)
+            discordChatRelay.getDiscordBotWrapper().unload();
     }
 
     public void reload() {
