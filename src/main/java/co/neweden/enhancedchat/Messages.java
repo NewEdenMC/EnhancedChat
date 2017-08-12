@@ -50,7 +50,7 @@ public class Messages implements Listener {
         }
     }
 
-    private String getHighestStatusMessage(String configSection, ProxiedPlayer player) {
+    public static String getHighestStatusMessage(String configSection, ProxiedPlayer player) {
         Configuration configGroups = EnhancedChat.getConfig().getSection(configSection + ".groups");
         String def = EnhancedChat.getConfig().getString(configSection + ".default", "");
 
