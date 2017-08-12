@@ -21,7 +21,7 @@ public class StringEval {
     private StringBuilder token = new StringBuilder();
     private char[] chars;
     private Map<String, String> tokens = new HashMap<>();
-    private int tokenStart = 0;
+    private boolean inToken = false;
     private enum Action { CONTINUE, NEXT }
     private ChatColor colourCode;
     private int segmentWordStart = 0;
@@ -111,21 +111,21 @@ public class StringEval {
     private Action evalToken(int i) {
         if (tokens.isEmpty()) return Action.NEXT;
 
-        if (chars[i] == '%' && tokenStart == 0) {
+        if (chars[i] == '%' && !inToken) {
             // token start detected, save position and char, continue to next char
-            tokenStart = i; token.append(chars[i]); return Action.CONTINUE;
+            inToken = true; token.append(chars[i]); return Action.CONTINUE;
         }
 
-        if (tokenStart != 0 && chars[i] != '%') {
+        if (inToken && chars[i] != '%') {
             // currently in a token, save char for evaluation later, continue to next char
             token.append(chars[i]); return Action.CONTINUE;
         }
 
-        if (tokenStart != 0 && chars[i] == '%') {
+        if (inToken && chars[i] == '%') {
             // token end detected, if token exists append value otherwise append raw token, reset, continue to next char
             String ct = token.toString() + '%';
             segment.append(tokens.getOrDefault(ct, ct));
-            tokenStart = 0; token.setLength(0);
+            inToken = false; token.setLength(0);
             return Action.CONTINUE;
         }
 
