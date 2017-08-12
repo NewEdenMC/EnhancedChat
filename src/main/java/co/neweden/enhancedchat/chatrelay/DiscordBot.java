@@ -6,6 +6,7 @@ import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.config.Configuration;
 
 import javax.security.auth.login.LoginException;
@@ -60,6 +61,13 @@ public class DiscordBot {
             chInfo.herochat_channel_name = channelName;
             chInfo.discord_channel_id = section.getLong("discord_channel_id", 0);
             chInfo.discord_webhook_url = section.getString("webhook_url", "");
+            chInfo.herochat_delimiter = section.getString("herochat_delimiter",
+                    EnhancedChat.getConfig().getString("discord_chat_relay.herochat_default_delimiter", "&f: ")
+            );
+            chInfo.herochat_delimiter = ChatColor.translateAlternateColorCodes('&', chInfo.herochat_delimiter);
+            chInfo.discord_to_game_format = section.getString("discord_to_game_format",
+                    EnhancedChat.getConfig().getString("discord_chat_relay.discord_to_game_default_format", "&b#Discord %displayName%&f: %message%")
+            );
 
             if (mainChannel.equalsIgnoreCase(channelName))
                 this.mainChannel = chInfo;
@@ -81,12 +89,14 @@ public class DiscordBot {
     public Collection<ChannelInfo> getChannels() { return herochatChannels.values(); }
 
     public void sendInfoMessage(ChannelInfo channel, String message) {
+        message = message.replace('\u00A7', '\u0000');
         try {
             sendData(channel, "{\"username\":\"MC Server\",\"embeds\":[{\"description\":\"" + message + "\"}]}");
         } catch (IOException e) { EnhancedChat.getLogger().log(Level.SEVERE, "UOException occurred while trying to send an info message to a Discord channel", e); }
     }
 
     public void sendUserMessage(ChannelInfo channel, String message, String from) {
+        message = message.replace('\u00A7', '\u0000');
         try {
             sendData(channel, "{\"content\":\"" + message + "\",\"username\":\"[MC] " + from + "\"}");
         } catch (IOException e) { EnhancedChat.getLogger().log(Level.SEVERE, "UOException occurred while trying to send a user message to a Discord channel", e); }
@@ -114,7 +124,7 @@ public class DiscordBot {
         // For POST only - END
 
         if (con.getResponseCode() >= 300) {
-            EnhancedChat.getLogger().warning("Discord Web Hook API responded with an unexpected HTTP Status Code: " + con.getResponseCode() + " " + con.getResponseMessage());
+            EnhancedChat.getLogger().warning("Discord Web Hook API responded with an unexpected HTTP Status Code: " + con.getResponseCode() + " " + con.getResponseMessage() + "\nRequest was: " + params);
         }
     }
 

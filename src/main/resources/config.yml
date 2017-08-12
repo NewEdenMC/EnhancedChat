@@ -41,7 +41,6 @@ commands:
 discord_chat_relay:
   enabled: false
   bot_token: ''
-  herochat_delimiter: '&f: '
 
   # Customise the message that is displayed when a Player connects to the Proxy
   # You can set different messages per Group
@@ -58,9 +57,13 @@ discord_chat_relay:
     default: '%displayName% has left'
 
   main_herochat_channel: Global
+  herochat_delimiter_default: "&f: "
+  discord_to_game_default_format: '&b#Discord %displayName%&f: %message%'
   herochat_channels:
     # Each section represents a Herochat channel and which Discord channel chat should be relayed between
     Global:
       enabled: false
       webhook_url: https://discordapp.com/api/webhooks/...
       discord_channel_id: 123456789
+      herochat_delimiter: '&f: '
+      discord_to_game_format: '&b#Discord [G] %displayName%&f: %message%'
