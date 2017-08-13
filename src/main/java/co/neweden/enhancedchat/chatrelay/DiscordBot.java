@@ -7,6 +7,8 @@ import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.config.Configuration;
 
 import javax.security.auth.login.LoginException;
@@ -17,6 +19,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class DiscordBot {
@@ -97,8 +100,10 @@ public class DiscordBot {
 
     public void sendUserMessage(ChannelInfo channel, String message, String from) {
         message = message.replace('\u00A7', '\u0000');
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(from);
+        String avatarPart = player != null ? ",\"avatar_url\":\"https://crafatar.com/renders/head/" + player.getUniqueId() + "?overlay=true\"" : "";
         try {
-            sendData(channel, "{\"content\":\"" + message + "\",\"username\":\"[MC] " + from + "\"}");
+            sendData(channel, "{\"content\":\"" + message + "\",\"username\":\"[MC] " + from + "\"" + avatarPart + "}");
         } catch (IOException e) { EnhancedChat.getLogger().log(Level.SEVERE, "UOException occurred while trying to send a user message to a Discord channel", e); }
     }
 
