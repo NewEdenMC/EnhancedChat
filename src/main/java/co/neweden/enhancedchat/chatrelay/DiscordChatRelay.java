@@ -97,6 +97,7 @@ public class DiscordChatRelay extends ListenerAdapter implements Listener {
         for (ChannelInfo ci : bot.getChannels()) {
             if (ci.discord_channel_id != event.getChannel().getIdLong()) continue;
             for (ServerInfo server : ProxyServer.getInstance().getServers().values()) {
+                if (server.getPlayers().isEmpty()) continue;
                 try {
                     Map<String, String> tokens = new HashMap<>();
                     tokens.put("%displayName%", event.getMember().getEffectiveName());
