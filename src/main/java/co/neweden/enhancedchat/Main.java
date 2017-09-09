@@ -1,5 +1,6 @@
 package co.neweden.enhancedchat;
 
+import co.neweden.enhancedchat.chat.ChatManager;
 import co.neweden.enhancedchat.chatrelay.DiscordChatRelay;
 import com.google.common.io.ByteStreams;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -52,7 +53,7 @@ public class Main extends Plugin {
         } catch (IOException e) {
             getLogger().log(Level.SEVERE, e.getMessage(), e);
         }
-        new Messages(); new Commands();
+        new Messages(); new Commands(); new ChatManager();
         discordChatRelay = new DiscordChatRelay();
         loadDynamicCommands();
         EnhancedChat.startUpLoad = false;

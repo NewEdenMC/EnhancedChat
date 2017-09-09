@@ -38,6 +38,23 @@ commands:
   /ping:
     file: cmd/ping.txt
 
+chat:
+  enabled: false
+  defaults:
+    formatting:
+      ingame_normal: '&b#%chShortName% %displayName%&f: %message%'
+      ingame_emote: '&b#%chShortName% &e* %displayName% %message%'
+  channels:
+    General:
+      enabled: true
+      shortName: G
+    Staff:
+      enabled: true
+      shortName: S
+      formatting:
+        ingame_normal: '&6#%chShortName% %displayName%&f: &6%message%'
+        ingame_emote: '&6#%chShortName% &6* %displayName% %message%'
+
 discord_chat_relay:
   enabled: false
   bot_token: ''
