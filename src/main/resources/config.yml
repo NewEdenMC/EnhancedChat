@@ -42,8 +42,8 @@ chat:
   enabled: false
   defaults:
     formatting:
-      ingame_normal: '&b#%chShortName% %displayName%&f: %message%'
-      ingame_emote: '&b#%chShortName% &e* %displayName% %message%'
+      game_normal: '&b#%chShortName% %displayName%&f: %message%'
+      game_emote: '&b#%chShortName% &e* %displayName% %message%'
   channels:
     General:
       enabled: true
@@ -52,8 +52,8 @@ chat:
       enabled: true
       shortName: S
       formatting:
-        ingame_normal: '&6#%chShortName% %displayName%&f: &6%message%'
-        ingame_emote: '&6#%chShortName% &6* %displayName% %message%'
+        game_normal: '&6#%chShortName% %displayName%&f: &6%message%'
+        game_emote: '&6#%chShortName% &6* %displayName% %message%'
 
 discord_chat_relay:
   enabled: false
