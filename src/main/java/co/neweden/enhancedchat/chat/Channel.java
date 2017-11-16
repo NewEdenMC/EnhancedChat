@@ -1,7 +1,9 @@
 package co.neweden.enhancedchat.chat;
 
 import co.neweden.enhancedchat.EnhancedChat;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.config.Configuration;
@@ -46,12 +48,25 @@ public class Channel {
     }
 
     public void joinPlayer(ProxiedPlayer player) {
-        if (!player.hasPermission("enhancedchat.channel." + getName() + ".join")) return;
+        if (!canJoin(player)) return;
         chatters.add(player);
-        ChatManager.setActiveChannel(player, this);
     }
 
-    public void removePlayer(ProxiedPlayer player) { chatters.remove(player); }
+    public boolean canJoin(ProxiedPlayer player) {
+        return player.hasPermission("enhancedchat.channel." + getName() + ".join");
+    }
+
+    public void removePlayer(ProxiedPlayer player) {
+        if (ChatManager.getActiveChannel(player).equals(this)) {
+            Channel newActive = null;
+            Optional<Channel> opt = ChatManager.getChannels().stream().filter(e -> e.getChatters().contains(player)).findFirst();
+            if (opt.isPresent())
+                newActive = opt.get();
+            ChatManager.setActiveChannel(player, newActive);
+        }
+        chatters.remove(player);
+        player.sendMessage(new ComponentBuilder("You have left the channel: ").color(ChatColor.AQUA).append(getName()).color(ChatColor.WHITE).create());
+    }
 
     /**
      * Gets a Collection representing ProxiedPlayers who are currently in this channel
