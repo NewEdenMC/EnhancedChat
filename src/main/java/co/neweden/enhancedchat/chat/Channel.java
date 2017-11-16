@@ -26,7 +26,7 @@ public class Channel {
         if (!channel.getBoolean("enabled", false)) throw new IllegalArgumentException("EnhancedChat Channel '" + key + "' cannot be created because it is not enabled.");
         name = key;
         shortName = channel.getString("shortName", key);
-        formatGameNormal = channel.getString("formatting.game_normal", defaults.getString("formatting.game_normal", "&b#%chShortName% %nickName%&f: %message%"));
+        formatGameNormal = channel.getString("formatting.game_normal", defaults.getString("formatting.game_normal", "&b#%chShortName% %displayName%&f: %message%"));
         formatGameEmote = channel.getString("formatting.game_emote", defaults.getString("formatting.game_emote", "&b#%chShortName% &e* %displayName% %message%"));
 
         for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
