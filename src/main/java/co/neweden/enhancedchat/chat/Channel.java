@@ -44,19 +44,23 @@ public class Channel {
 
     protected void initialJoinPlayer(ProxiedPlayer player) {
         if (!player.hasPermission("enhancedchat.channel." + getName() + ".autojoin")) return;
-        joinPlayer(player);
+        joinPlayer(player, true);
     }
 
-    public void joinPlayer(ProxiedPlayer player) {
+    public void joinPlayer(ProxiedPlayer player) { joinPlayer(player, false); }
+    public void joinPlayer(ProxiedPlayer player, boolean silentJoin) {
         if (!canJoin(player)) return;
         chatters.add(player);
+        if (!silentJoin)
+            player.sendMessage(new ComponentBuilder("You have joined the channel: ").color(ChatColor.GREEN).append(getName()).color(ChatColor.WHITE).create());
     }
 
     public boolean canJoin(ProxiedPlayer player) {
         return player.hasPermission("enhancedchat.channel." + getName() + ".join");
     }
 
-    public void removePlayer(ProxiedPlayer player) {
+    public void removePlayer(ProxiedPlayer player) { removePlayer(player, false); }
+    public void removePlayer(ProxiedPlayer player, boolean silentLeave) {
         if (ChatManager.getActiveChannel(player).equals(this)) {
             Channel newActive = null;
             Optional<Channel> opt = ChatManager.getChannels().stream().filter(e -> e.getChatters().contains(player)).findFirst();
@@ -65,7 +69,8 @@ public class Channel {
             ChatManager.setActiveChannel(player, newActive);
         }
         chatters.remove(player);
-        player.sendMessage(new ComponentBuilder("You have left the channel: ").color(ChatColor.AQUA).append(getName()).color(ChatColor.WHITE).create());
+        if (!silentLeave)
+            player.sendMessage(new ComponentBuilder("You have left the channel: ").color(ChatColor.AQUA).append(getName()).color(ChatColor.WHITE).create());
     }
 
     /**
