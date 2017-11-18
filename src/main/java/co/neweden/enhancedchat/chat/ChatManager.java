@@ -16,6 +16,9 @@ public class ChatManager {
     private static Map<ProxiedPlayer, Channel> talkingIn = new HashMap<>();
     private static EventListener eventHandler;
     private static PrivateMessageManager pmm;
+    private static boolean discordEnabled = false;
+    private static Channel discordStatusChannel = null;
+    private static DiscordBot discordBot = null;
 
     public ChatManager() {
         channels.clear();
@@ -36,6 +39,17 @@ public class ChatManager {
         eventHandler = new EventListener();
         new ChannelCommands(); new EmoteCommand();
         pmm = new PrivateMessageManager();
+
+        discordEnabled = config.getBoolean("discord_integration.enabled", false);
+        discordStatusChannel = null;
+        if (discordBot != null) {
+            discordBot.unload();
+            discordBot = null;
+        }
+        if (discordEnabled) {
+            discordStatusChannel = getChannel(EnhancedChat.getConfig().getString("discord_status_messages.message_channel", ""));
+            discordBot = new DiscordBot();
+        }
     }
 
     public static Collection<Channel> getChannels() { return Collections.unmodifiableCollection(channels.values()); }
@@ -59,14 +73,20 @@ public class ChatManager {
             player.sendMessage(new ComponentBuilder("You are now talking in the channel: ").color(ChatColor.AQUA).append(channel.getName()).color(ChatColor.WHITE).create());
     }
 
-    public static void sendMessageToActiveChannel(ProxiedPlayer from, MessageType type, String message) {
+    public static void sendMessageToActiveChannel(ProxiedPlayer from, Message.Format formatting, String message) {
         Channel activeChannel = ChatManager.getActiveChannel(from);
         if (activeChannel != null)
-            activeChannel.sendMessage(from, type, message);
+            activeChannel.sendMessage(from, Message.Source.PLAYER, formatting, message);
         else
             from.sendMessage(new ComponentBuilder("Your chat message could not be sent as you are not in a channel, try joining one: use ").color(ChatColor.RED).append("/ch list").color(ChatColor.GOLD).append(" to see a list of channels and ").color(ChatColor.RED).append("/ch join NAME").color(ChatColor.GOLD).append(" to join a channel.").color(ChatColor.RED).create());
     }
 
     public static PrivateMessageManager getPrivateMessageManager() { return pmm; }
+
+    public static boolean isDiscordEnabled() { return discordEnabled; }
+
+    public static Channel getDiscordStatusChannel() { return discordStatusChannel; }
+
+    public static DiscordBot getDiscordBot() { return discordBot; }
 
 }

@@ -1,7 +1,6 @@
 package co.neweden.enhancedchat;
 
 import co.neweden.enhancedchat.chat.ChatManager;
-import co.neweden.enhancedchat.chatrelay.DiscordChatRelay;
 import com.google.common.io.ByteStreams;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
@@ -16,7 +15,6 @@ import java.util.logging.Level;
 public class Main extends Plugin {
 
     private Configuration config;
-    private DiscordChatRelay discordChatRelay;
 
     @Override
     public void onEnable() {
@@ -26,8 +24,8 @@ public class Main extends Plugin {
 
     @Override
     public void onDisable() {
-        if (discordChatRelay.getDiscordBotWrapper() != null)
-            discordChatRelay.getDiscordBotWrapper().unload();
+        if (ChatManager.getDiscordBot() != null)
+            ChatManager.getDiscordBot().unload();
     }
 
     public void reload() {
@@ -54,7 +52,6 @@ public class Main extends Plugin {
             getLogger().log(Level.SEVERE, e.getMessage(), e);
         }
         new Messages(); new Commands(); new ChatManager();
-        discordChatRelay = new DiscordChatRelay();
         loadDynamicCommands();
         EnhancedChat.startUpLoad = false;
     }

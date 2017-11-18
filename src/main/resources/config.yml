@@ -47,20 +47,30 @@ chat:
     formatting:
       player_normal: '&b#%chShortName% %displayName%&f: %message%'
       player_emote: '&b#%chShortName% &e* %displayName% %message%'
+      discord_normal: '&b#%chShortName% #Discord %displayName%&f: %message%'
+  discord_integration:
+    enabled: false
+    bot_token: ''
   channels:
     General:
       enabled: true
       shortName: G
+      discord:
+        webhook_url: https://discordapp.com/api/webhooks/...
+        channel_id: 123456789
     Staff:
       enabled: true
       shortName: S
+      discord:
+        webhook_url: https://discordapp.com/api/webhooks/...
+        discord_channel_id: 123456789
       formatting:
         plyaer_normal: '&6#%chShortName% %displayName%&f: &6%message%'
         player_emote: '&6#%chShortName% &6* %displayName% %message%'
+        discord_normal: '&6#%chShortName% #Discord %displayName%&f: &6%message%'
 
-discord_chat_relay:
-  enabled: false
-  bot_token: ''
+discord_status_messages:
+  message_channel: General
 
   # Customise the message that is displayed when a Player connects to the Proxy
   # You can set different messages per Group
@@ -75,15 +85,3 @@ discord_chat_relay:
   quit-messages:
     enabled: true
     default: '%displayName% has left'
-
-  main_herochat_channel: Global
-  herochat_delimiter_default: "&f: "
-  discord_to_game_default_format: '&b#Discord %displayName%&f: %message%'
-  herochat_channels:
-    # Each section represents a Herochat channel and which Discord channel chat should be relayed between
-    Global:
-      enabled: false
-      webhook_url: https://discordapp.com/api/webhooks/...
-      discord_channel_id: 123456789
-      herochat_delimiter: '&f: '
-      discord_to_game_format: '&b#Discord [G] %displayName%&f: %message%'
