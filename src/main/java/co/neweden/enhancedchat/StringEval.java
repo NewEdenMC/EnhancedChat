@@ -19,8 +19,9 @@ public class StringEval {
     private TextComponent textComponent;
     private StringBuilder segment = new StringBuilder();
     private StringBuilder token = new StringBuilder();
+    private StringEval evalToken;
     private char[] chars;
-    private Map<String, String> tokens = new HashMap<>();
+    private Map<String, Object> tokens = new HashMap<>();
     private boolean inToken = false;
     private enum Action { CONTINUE, NEXT }
     private ChatColor colourCode;
@@ -34,6 +35,10 @@ public class StringEval {
     private boolean underlineURLs = true;
 
     public StringEval(String string) { stringToEval = string; }
+
+    public StringEval addToken(String name, String value) { tokens.put(name, value); return this; }
+
+    public StringEval addToken(String name, StringEval value) { tokens.put(name, value); return this; }
 
     public StringEval addTokens(Map<String, String> tokens) { this.tokens.putAll(tokens); return this;}
 
@@ -97,6 +102,13 @@ public class StringEval {
             inURL = false;
         }
         textComponent.addExtra(tc);
+
+        if (evalToken != null) {
+            TextComponent tokenTC = evalToken.getTextComponent();
+            tokenTC.setColor(colourCode);
+            textComponent.addExtra(tokenTC);
+        }
+
         segment.setLength(0);
         segmentWordStart = 0;
     }
@@ -124,8 +136,13 @@ public class StringEval {
         if (inToken && chars[i] == '%') {
             // token end detected, if token exists append value otherwise append raw token, reset, continue to next char
             String ct = token.toString() + '%';
-            segment.append(tokens.getOrDefault(ct, ct));
-            inToken = false; token.setLength(0);
+            Object value = tokens.getOrDefault(ct, ct);
+            if (value instanceof StringEval) {
+                evalToken = (StringEval) value;
+                nextSegment();
+            } else
+                segment.append(value);
+            inToken = false; token.setLength(0); evalToken = null;
             return Action.CONTINUE;
         }
 
