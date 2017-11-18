@@ -33,7 +33,7 @@ public class EmoteCommand extends Command {
                 emote.append(' ');
         }
 
-        ChatManager.sendMessageToActiveChannel(player, MessageType.GAME_EMOTE, emote.toString());
+        ChatManager.sendMessageToActiveChannel(player, MessageType.PLAYER_EMOTE, emote.toString());
     }
 
 }

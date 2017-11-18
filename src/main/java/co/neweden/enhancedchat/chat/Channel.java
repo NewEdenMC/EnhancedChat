@@ -95,8 +95,8 @@ public class Channel {
         tokens.put("%message%", message);
         String format = "";
         switch (type) {
-            case GAME_NORMAL: format = getFormatGameNormal(); break;
-            case GAME_EMOTE: format = getFormatGameEmote(); break;
+            case PLAYER_NORMAL: format = getFormatGameNormal(); break;
+            case PLAYER_EMOTE: format = getFormatGameEmote(); break;
         }
         TextComponent out = EnhancedChat.evalMessage(format, tokens).getTextComponent();
         for (ProxiedPlayer player : getChatters()) {
