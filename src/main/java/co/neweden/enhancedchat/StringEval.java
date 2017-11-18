@@ -6,7 +6,9 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,6 +19,7 @@ public class StringEval {
 
     private String stringToEval;
     private TextComponent textComponent;
+    private List<TextComponent> textComponents = new ArrayList<>();
     private StringBuilder segment = new StringBuilder();
     private StringBuilder token = new StringBuilder();
     private StringEval evalToken;
@@ -25,6 +28,11 @@ public class StringEval {
     private boolean inToken = false;
     private enum Action { CONTINUE, NEXT }
     private ChatColor colourCode;
+    private boolean isBold = false;
+    private boolean isUnderline = false;
+    private boolean isItalic = false;
+    private boolean isStrike = false;
+    private boolean isObfuscated = false;
     private int segmentWordStart = 0;
     private boolean inURL = false;
 
@@ -63,7 +71,7 @@ public class StringEval {
             if (evalToken(i) == Action.CONTINUE)
                 continue;
 
-            // Evaluate for colour codes
+            // Evaluate for formatting codes
             if (stripFormatting) {
                 if (chars[i] == '\u00A7')
                     continue;
@@ -71,7 +79,17 @@ public class StringEval {
                 if (chars[i] == '&' && "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(chars[i + 1]) >= 0) {
                     i++;
                     nextSegment();
-                    colourCode = ChatColor.getByChar(chars[i]);
+                    switch (chars[i]) {
+                        case 'L': case 'l': isBold = true; break;
+                        case 'N': case 'n': isUnderline = true; break;
+                        case 'O': case 'o': isItalic = true; break;
+                        case 'M': case 'm': isStrike = true; break;
+                        case 'K': case 'k': isObfuscated = true; break;
+                        default:
+                            colourCode = ChatColor.getByChar(chars[i]);
+                            isBold = false; isUnderline = false; isItalic = false;
+                            isStrike = false; isObfuscated = false;
+                    }
                     continue;
                 }
             }
@@ -89,6 +107,11 @@ public class StringEval {
     private void nextSegment() {
         TextComponent tc = new TextComponent(segment.toString());
         tc.setColor(colourCode);
+        if (isBold) tc.setBold(true);
+        if (isUnderline) tc.setUnderlined(true);
+        if (isItalic) tc.setItalic(true);
+        if (isStrike) tc.setStrikethrough(true);
+        if (isObfuscated) tc.setObfuscated(true);
         if (inURL) {
             String rawURL = segment.toString();
             if (!rawURL.substring(0, 6).equalsIgnoreCase("http://") || !rawURL.substring(0, 7).equalsIgnoreCase("https://"))
@@ -101,12 +124,17 @@ public class StringEval {
             ));
             inURL = false;
         }
-        textComponent.addExtra(tc);
+        textComponents.add(tc);
 
         if (evalToken != null) {
             TextComponent tokenTC = evalToken.getTextComponent();
             tokenTC.setColor(colourCode);
-            textComponent.addExtra(tokenTC);
+            if (isBold) tokenTC.setBold(true);
+            if (isUnderline) tokenTC.setUnderlined(true);
+            if (isItalic) tokenTC.setItalic(true);
+            if (isStrike) tokenTC.setStrikethrough(true);
+            if (isObfuscated) tokenTC.setObfuscated(true);
+            textComponents.add(tokenTC);
         }
 
         segment.setLength(0);
@@ -186,8 +214,12 @@ public class StringEval {
     }
 
     public TextComponent getTextComponent() {
-        if (textComponent == null) eval();
-        return textComponent;
+        if (textComponents.size() <= 0) eval();
+        TextComponent tc = new TextComponent();
+        for (TextComponent t : textComponents) {
+            tc.addExtra(t);
+        }
+        return tc;
     }
 
     @Override
