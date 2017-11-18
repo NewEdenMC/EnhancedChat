@@ -46,7 +46,7 @@ public class ChatManager {
     public static void setActiveChannel(ProxiedPlayer player, Channel channel) { setActiveChannel(player, channel, false); }
     public static void setActiveChannel(ProxiedPlayer player, Channel channel, boolean setSilently) {
         if (channel == null) {
-            talkingIn.put(player, null); return;
+            talkingIn.remove(player); return;
         }
 
         if (!channel.getChatters().contains(player)) return;
