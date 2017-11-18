@@ -36,8 +36,8 @@ public class Channel {
         shortName = channel.getString("shortName", key);
         discordWebhookURL = channel.getString("discord.webhook_url", "");
         discordChannelID = channel.getLong("discord.channel_id", 0);
-        formatGameNormal = channel.getString("formatting.game_normal", defaults.getString("formatting.game_normal", "&b#%chShortName% %displayName%&f: %message%"));
-        formatGameEmote = channel.getString("formatting.game_emote", defaults.getString("formatting.game_emote", "&b#%chShortName% &e* %displayName% %message%"));
+        formatGameNormal = channel.getString("formatting.player_normal", defaults.getString("formatting.player_normal", "&b#%chShortName% %displayName%&f: %message%"));
+        formatGameEmote = channel.getString("formatting.player_emote", defaults.getString("formatting.player_emote", "&b#%chShortName% &e* %displayName% %message%"));
         formatDiscordNormal = channel.getString("formatting.discord_normal", defaults.getString("formatting.discord_normal", "&b#%chShortName% #Discord %displayName%&f: %message%"));
 
         for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
