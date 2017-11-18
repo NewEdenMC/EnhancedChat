@@ -1,6 +1,7 @@
 package co.neweden.enhancedchat.chat;
 
 import co.neweden.enhancedchat.EnhancedChat;
+import co.neweden.enhancedchat.chat.privatemessage.PrivateMessageManager;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -14,6 +15,7 @@ public class ChatManager {
     private static Map<String, Channel> channels = new LinkedHashMap<>();
     private static Map<ProxiedPlayer, Channel> talkingIn = new HashMap<>();
     private static EventListener eventHandler;
+    private static PrivateMessageManager pmm;
 
     public ChatManager() {
         channels.clear();
@@ -33,6 +35,7 @@ public class ChatManager {
             ProxyServer.getInstance().getPluginManager().unregisterListener(eventHandler);
         eventHandler = new EventListener();
         new ChannelCommands(); new EmoteCommand();
+        pmm = new PrivateMessageManager();
     }
 
     public static Collection<Channel> getChannels() { return Collections.unmodifiableCollection(channels.values()); }
@@ -63,5 +66,7 @@ public class ChatManager {
         else
             from.sendMessage(new ComponentBuilder("Your chat message could not be sent as you are not in a channel, try joining one: use ").color(ChatColor.RED).append("/ch list").color(ChatColor.GOLD).append(" to see a list of channels and ").color(ChatColor.RED).append("/ch join NAME").color(ChatColor.GOLD).append(" to join a channel.").color(ChatColor.RED).create());
     }
+
+    public static PrivateMessageManager getPrivateMessageManager() { return pmm; }
 
 }

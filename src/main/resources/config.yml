@@ -40,6 +40,9 @@ commands:
 
 chat:
   enabled: false
+  private_messaging:
+    message_format: '&c[%fromDisplayName% -> %toDisplayName%] &f%message%'
+    me_format: '&7&ome&c'
   defaults:
     formatting:
       game_normal: '&b#%chShortName% %displayName%&f: %message%'
