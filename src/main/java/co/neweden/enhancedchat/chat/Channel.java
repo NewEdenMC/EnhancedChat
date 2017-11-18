@@ -42,9 +42,10 @@ public class Channel {
 
     public String getFormatGameEmote() { return formatGameEmote; }
 
-    protected void initialJoinPlayer(ProxiedPlayer player) {
-        if (!player.hasPermission("enhancedchat.channel." + getName() + ".autojoin")) return;
+    protected boolean initialJoinPlayer(ProxiedPlayer player) {
+        if (!player.hasPermission("enhancedchat.channel." + getName() + ".autojoin")) return false;
         joinPlayer(player, true);
+        return true;
     }
 
     public void joinPlayer(ProxiedPlayer player) { joinPlayer(player, false); }
