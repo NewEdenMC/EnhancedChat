@@ -135,6 +135,10 @@ public class StringEval {
             if (isStrike) tokenTC.setStrikethrough(true);
             if (isObfuscated) tokenTC.setObfuscated(true);
             textComponents.add(tokenTC);
+            colourCode = evalToken.colourCode;
+            isBold = evalToken.isBold; isUnderline = evalToken.isUnderline;
+            isItalic = evalToken.isItalic; isStrike = evalToken.isStrike;
+            isObfuscated = evalToken.isObfuscated;
         }
 
         segment.setLength(0);
