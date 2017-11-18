@@ -50,7 +50,7 @@ public class ChannelCommands extends Command {
             if (!channel.canJoin(player) && !joined) continue;
             out.append("&f[").append(channel.getShortName()).append("] ")
                     .append(channel.getName()).append(joined ? " &a+" : " &c-");
-            if (ChatManager.getActiveChannel(player).equals(channel)) out.append(" &e*");
+            if (channel.equals(ChatManager.getActiveChannel(player))) out.append(" &e*");
             out.append('\n');
             size++;
         }
