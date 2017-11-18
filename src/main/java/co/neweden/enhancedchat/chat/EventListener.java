@@ -37,12 +37,7 @@ public class EventListener implements Listener {
         if (!(event.getSender() instanceof ProxiedPlayer) || event.isCommand()) return;
         ProxiedPlayer sender = (ProxiedPlayer) event.getSender();
         event.setCancelled(true);
-
-        Channel activeChannel = ChatManager.getActiveChannel(sender);
-        if (activeChannel != null)
-            activeChannel.sendMessage(sender, MessageType.GAME_NORMAL, event.getMessage());
-        else
-            sender.sendMessage(new ComponentBuilder("Your chat message could not be sent as you are not in a channel, try joining one: use ").color(ChatColor.RED).append("/ch list").color(ChatColor.GOLD).append(" to see a list of channels and ").color(ChatColor.RED).append("/ch join NAME").color(ChatColor.GOLD).append(" to join a channel.").color(ChatColor.RED).create());
+        ChatManager.sendMessageToActiveChannel(sender, MessageType.GAME_NORMAL, event.getMessage());
     }
 
 }
