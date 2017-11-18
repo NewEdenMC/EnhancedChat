@@ -22,10 +22,14 @@ public class EventListener implements Listener {
     @EventHandler
     public void onPostLogin(PostLoginEvent event) {
         Iterator<Channel> channels = new LinkedList<>(ChatManager.getChannels()).descendingIterator();
+        Channel lastJoined = null;
         while (channels.hasNext()) {
             Channel channel = channels.next();
-            channel.initialJoinPlayer(event.getPlayer());
+            if (channel.initialJoinPlayer(event.getPlayer()))
+                lastJoined = channel;
         }
+        if (lastJoined != null)
+            ChatManager.setActiveChannel(event.getPlayer(), lastJoined);
     }
 
     @EventHandler
