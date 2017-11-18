@@ -62,16 +62,17 @@ public class Channel {
 
     public void removePlayer(ProxiedPlayer player) { removePlayer(player, false); }
     public void removePlayer(ProxiedPlayer player, boolean silentLeave) {
-        if (ChatManager.getActiveChannel(player).equals(this)) {
-            Channel newActive = null;
-            Optional<Channel> opt = ChatManager.getChannels().stream().filter(e -> e.getChatters().contains(player)).findFirst();
-            if (opt.isPresent())
-                newActive = opt.get();
-            ChatManager.setActiveChannel(player, newActive);
-        }
         chatters.remove(player);
         if (!silentLeave)
-            player.sendMessage(new ComponentBuilder("You have left the channel: ").color(ChatColor.AQUA).append(getName()).color(ChatColor.WHITE).create());
+            player.sendMessage(new ComponentBuilder("You have left the channel: ").color(ChatColor.RED).append(getName()).color(ChatColor.WHITE).create());
+
+        if (!this.equals(ChatManager.getActiveChannel(player))) return;
+
+        Channel newActive = null;
+        Optional<Channel> opt = ChatManager.getChannels().stream().filter(e -> e.getChatters().contains(player)).findFirst();
+        if (opt.isPresent())
+            newActive = opt.get();
+        ChatManager.setActiveChannel(player, newActive, silentLeave);
     }
 
     /**
