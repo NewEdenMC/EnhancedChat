@@ -32,6 +32,7 @@ public class ChatManager {
         if (eventHandler != null)
             ProxyServer.getInstance().getPluginManager().unregisterListener(eventHandler);
         eventHandler = new EventListener();
+        new ChannelCommands();
     }
 
     public static Collection<Channel> getChannels() { return Collections.unmodifiableCollection(channels.values()); }
