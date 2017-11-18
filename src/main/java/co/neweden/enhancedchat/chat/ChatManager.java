@@ -39,15 +39,7 @@ public class ChatManager {
     public static Channel getChannel(String name) { return channels.get(name); }
 
     public static Channel getActiveChannel(ProxiedPlayer player) {
-        Channel channel = talkingIn.get(player);
-        if (channel == null) {
-            Optional<Channel> opt = getChannels().stream().filter(e -> e.getChatters().contains(player)).findFirst();
-            if (opt.isPresent()) {
-                channel = opt.get();
-                talkingIn.put(player, channel);
-            }
-        }
-        return channel;
+        return talkingIn.get(player);
     }
 
     public static void setActiveChannel(ProxiedPlayer player, Channel channel) {
