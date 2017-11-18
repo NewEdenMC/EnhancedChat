@@ -29,7 +29,7 @@ public class EventListener implements Listener {
                 lastJoined = channel;
         }
         if (lastJoined != null)
-            ChatManager.setActiveChannel(event.getPlayer(), lastJoined);
+            ChatManager.setActiveChannel(event.getPlayer(), lastJoined, true);
     }
 
     @EventHandler

@@ -42,7 +42,8 @@ public class ChatManager {
         return talkingIn.get(player);
     }
 
-    public static void setActiveChannel(ProxiedPlayer player, Channel channel) {
+    public static void setActiveChannel(ProxiedPlayer player, Channel channel) { setActiveChannel(player, channel, false); }
+    public static void setActiveChannel(ProxiedPlayer player, Channel channel, boolean setSilently) {
         if (channel == null) {
             talkingIn.put(player, null); return;
         }
@@ -50,7 +51,8 @@ public class ChatManager {
         if (!channel.getChatters().contains(player)) return;
 
         talkingIn.put(player, channel);
-        player.sendMessage(new ComponentBuilder("You are now talking in the channel: ").color(ChatColor.AQUA).append(channel.getName()).color(ChatColor.WHITE).create());
+        if (!setSilently)
+            player.sendMessage(new ComponentBuilder("You are now talking in the channel: ").color(ChatColor.AQUA).append(channel.getName()).color(ChatColor.WHITE).create());
     }
 
 }
