@@ -38,8 +38,16 @@ commands:
   /ping:
     file: cmd/ping.txt
 
+mysql:
+   host: localhost
+   port: 3306
+   database: enhancedchat
+   user: mc
+   password:
+
 chat:
   enabled: false
+  enable_database_dependent_features: true
   private_messaging:
     message_format: '&c[%fromDisplayName% -> %toDisplayName%] &f%message%'
     me_format: '&7&ome&c'

@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,12 +25,17 @@ public class EnhancedChat {
     protected static Main plugin;
     protected static Map<String, StringEval> formattedChat = new HashMap<>();
     protected static boolean startUpLoad = true;
+    static Connection db = null;
 
     public static Main getPlugin() { return plugin; }
 
     public static Logger getLogger() { return plugin.getLogger(); }
 
     public static Configuration getConfig() { return plugin.getConfig(); }
+
+    public static boolean isDBConnected() { return db != null; }
+
+    protected static Connection getDB() { return db; }
 
     public static Path evalPath(String path) throws InvalidPathException {
         if (path.equals(""))

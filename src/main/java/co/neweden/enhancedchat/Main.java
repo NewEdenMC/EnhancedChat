@@ -8,6 +8,8 @@ import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
 
 import java.io.*;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -26,6 +28,14 @@ public class Main extends Plugin {
     public void onDisable() {
         if (ChatManager.getDiscordBot() != null)
             ChatManager.getDiscordBot().unload();
+        if (EnhancedChat.isDBConnected()) {
+            try {
+                EnhancedChat.getDB().close();
+            } catch (SQLException e) {
+                getLogger().log(Level.WARNING, "Could not close Database Connection, the current operation will still continue but you should investigate this.", e);
+            }
+        }
+        EnhancedChat.db = null;
     }
 
     public void reload() {
@@ -52,8 +62,49 @@ public class Main extends Plugin {
             getLogger().log(Level.SEVERE, e.getMessage(), e);
         }
         new Messages(); new Commands(); new ChatManager();
+        if (config.getBoolean("chat.enabled", false) && config.getBoolean("chat.enable_database_dependent_features", true)) {
+            if (loadDBConnection())
+                setupDB();
+            else
+                getLogger().warning("Some parts of the chat system will not be enabled as a Database Connection could not be established.");
+        }
         loadDynamicCommands();
         EnhancedChat.startUpLoad = false;
+    }
+
+    private boolean loadDBConnection() {
+        String host = getConfig().getString("mysql.host", null);
+        String port = getConfig().getString("mysql.port", null);
+        String database = getConfig().getString("mysql.database", null);
+        if (host == null || port == null || database == null) {
+            getLogger().log(Level.INFO, "No database information received from config.");
+            return false;
+        }
+
+        String url = String.format("jdbc:mysql://%s:%s/%s?autoReconnect=true", host, port, database);
+
+        try {
+            EnhancedChat.db = DriverManager.getConnection(url, getConfig().getString("mysql.user", ""), getConfig().getString("mysql.password", "+"));
+        } catch (SQLException e) {
+            getLogger().log(Level.SEVERE, "An SQLException occurred while trying to connect to the database.", e);
+            return false;
+        }
+        getLogger().log(Level.INFO, "Connected to MySQL Database");
+        return true;
+    }
+
+    private void setupDB() {
+        try {
+            EnhancedChat.getDB().createStatement().execute(
+                    "CREATE TABLE IF NOT EXISTS `player_data` (\n" +
+                    "  `uuid` VARCHAR(36) NOT NULL,\n" +
+                    "  `nickname` VARCHAR(16) NULL,\n" +
+                    "  PRIMARY KEY (`uuid`)\n" +
+                    ");\n"
+            );
+        } catch (SQLException e) {
+            getLogger().log(Level.SEVERE, "Unable to setup database", e);
+        }
     }
 
     private void loadDynamicCommands() {
