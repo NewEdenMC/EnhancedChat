@@ -21,8 +21,10 @@ import java.util.logging.Level;
 
 public class Channel {
 
-    private String name;
-    private String shortName;
+    private String friendlyName;
+    private String machineName;
+    private String friendlyShortName;
+    private String machineShortName;
     private String discordWebhookURL;
     private long discordChannelID;
     private String formatGameNormal;
@@ -32,8 +34,10 @@ public class Channel {
 
     protected Channel(String key, Configuration channel, Configuration defaults) {
         if (!channel.getBoolean("enabled", false)) throw new IllegalArgumentException("EnhancedChat Channel '" + key + "' cannot be created because it is not enabled.");
-        name = key;
-        shortName = channel.getString("shortName", key);
+        friendlyName = key;
+        machineName = friendlyName.toUpperCase();
+        friendlyShortName = channel.getString("shortName", key);
+        machineShortName = friendlyShortName.toUpperCase();
         discordWebhookURL = channel.getString("discord.webhook_url", "");
         discordChannelID = channel.getLong("discord.channel_id", 0);
         formatGameNormal = channel.getString("formatting.player_normal", defaults.getString("formatting.player_normal", "&b#%chShortName% %displayName%&f: %message%"));
@@ -45,9 +49,13 @@ public class Channel {
         }
     }
 
-    public String getName() { return name; }
+    public String getName() { return friendlyName; }
 
-    public String getShortName() { return shortName; }
+    public String getMachineName() { return machineName; }
+
+    public String getShortName() { return friendlyShortName; }
+
+    public String getMachineShortName() { return machineShortName; }
 
     public String getDiscordWebhookURL() { return discordWebhookURL; }
 
