@@ -12,7 +12,7 @@ import java.util.*;
 
 public class ChatManager {
 
-    private static Map<String, Channel> channels = new LinkedHashMap<>();
+    private static Collection<Channel> channels = new HashSet<>();
     private static Map<ProxiedPlayer, Channel> talkingIn = new HashMap<>();
     private static EventListener eventHandler;
     private static PrivateMessageManager pmm;
@@ -31,7 +31,7 @@ public class ChatManager {
             String key = keys.next();
             Configuration chConfig = config.getSection("channels." + key);
             if (!chConfig.getBoolean("enabled", true)) return;
-            channels.put(key, new Channel(key, chConfig, config.getSection("defaults")));
+            channels.add(new Channel(key, chConfig, config.getSection("defaults")));
         }
 
         if (eventHandler != null)
@@ -52,9 +52,15 @@ public class ChatManager {
         }
     }
 
-    public static Collection<Channel> getChannels() { return Collections.unmodifiableCollection(channels.values()); }
+    public static Collection<Channel> getChannels() { return Collections.unmodifiableCollection(channels); }
 
-    public static Channel getChannel(String name) { return channels.get(name); }
+    public static Channel getChannel(String key) {
+        String machineKey = key.toUpperCase();
+        Optional<Channel> opt = channels.stream()
+                .filter(e -> e.getMachineName().equals(machineKey) || e.getMachineShortName().equals(machineKey))
+                .findFirst();
+        return opt.isPresent() ? opt.get() : null;
+    }
 
     public static Channel getActiveChannel(ProxiedPlayer player) {
         return talkingIn.get(player);
