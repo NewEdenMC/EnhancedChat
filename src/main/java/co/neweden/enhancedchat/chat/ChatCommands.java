@@ -4,7 +4,6 @@ import co.neweden.enhancedchat.EnhancedChat;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -21,20 +20,43 @@ public class ChatCommands extends Command {
 
     public void execute(CommandSender sender, String[] args) {
         if (args.length < 1) {
-            sender.sendMessage(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&',
-                    "&fChannel Sub-Commands:\n" +
-                    "&f- &blist&f: Show a list of channels available to you\n" +
-                    "&f- &bjoin {CHANNEL-NAME]&f: Join the specified channel\n" +
-                    "&f- &bleave {CHANNEL-NAME]&f: Leave the specified channel\n" +
-                    "&f- &b{CHANNEL-NAME]&f: Change the channel you are currently speaking in to another channel"
-            ))); return;
+            help(sender); return;
         }
 
         switch (args[0].toLowerCase()) {
-            case "list" : list(sender); break;
-            case "join" : join(sender, args); break;
-            case "leave" : leave(sender, args); break;
-            default: change(sender, args); break;
+            case "list" : list(sender); return;
+        }
+
+        if (sender instanceof ProxiedPlayer) {
+            switch (args[0].toLowerCase()) {
+                case "join" : join(sender, args); return;
+                case "leave" : leave(sender, args); return;
+                default: change(sender, args); return;
+            }
+        }
+
+        sender.sendMessage(new ComponentBuilder("Unknown sub-command").color(ChatColor.RED).create());
+    }
+
+    private void help(CommandSender sender) {
+        sender.sendMessage(new ComponentBuilder("Chat Sub-Commands:").color(ChatColor.WHITE).create());
+
+        String[] cmd = new String[4];
+        String[] desc = new String[4];
+        Boolean[] checkPlayer = new Boolean[4];
+
+        cmd[0] = "list"; desc[0] = "Show a list of channels available to you"; checkPlayer[0] = false;
+        cmd[1] = "join [CHANNEL-NAME]"; desc[1] = "Join the specified channel"; checkPlayer[1] = true;
+        cmd[2] = "leave [CHANNEL-NAME]"; desc[2] = "Leave the specified channel"; checkPlayer[2] = true;
+        cmd[3] = "[CHANNEL-NAME]"; desc[3] = "Change the channel you are currently speaking in to another channel"; checkPlayer[3] = true;
+
+        for (int i = 0; i < cmd.length; i++) {
+            if (checkPlayer[i] && !(sender instanceof ProxiedPlayer)) continue;
+            sender.sendMessage(
+                    new ComponentBuilder("- ").color(ChatColor.WHITE)
+                            .append(cmd[i]).color(ChatColor.AQUA)
+                            .append(": " + desc[i]).color(ChatColor.WHITE).create()
+            );
         }
     }
 
