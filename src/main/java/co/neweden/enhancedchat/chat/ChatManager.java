@@ -1,6 +1,8 @@
 package co.neweden.enhancedchat.chat;
 
 import co.neweden.enhancedchat.EnhancedChat;
+import co.neweden.enhancedchat.chat.commands.ChatCommands;
+import co.neweden.enhancedchat.chat.commands.EmoteCommand;
 import co.neweden.enhancedchat.chat.privatemessage.PrivateMessageManager;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;

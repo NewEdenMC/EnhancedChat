@@ -2,8 +2,8 @@ package co.neweden.enhancedchat.chat;
 
 public class Message {
 
-    enum Source { PLAYER, DISCORD }
+    public enum Source { PLAYER, DISCORD }
 
-    enum Format { NORMAL, EMOTE }
+    public enum Format { NORMAL, EMOTE }
 
 }

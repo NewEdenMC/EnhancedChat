@@ -1,6 +1,8 @@
-package co.neweden.enhancedchat.chat;
+package co.neweden.enhancedchat.chat.commands;
 
 import co.neweden.enhancedchat.EnhancedChat;
+import co.neweden.enhancedchat.chat.Channel;
+import co.neweden.enhancedchat.chat.ChatManager;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
@@ -13,7 +15,7 @@ import java.util.Collection;
 
 public class ChatCommands extends Command {
 
-    protected ChatCommands() {
+    public ChatCommands() {
         super("ch", null, "chat", "channel");
         ProxyServer.getInstance().getPluginManager().registerCommand(EnhancedChat.getPlugin(), this);
     }

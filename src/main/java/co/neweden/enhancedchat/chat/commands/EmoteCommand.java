@@ -1,6 +1,8 @@
-package co.neweden.enhancedchat.chat;
+package co.neweden.enhancedchat.chat.commands;
 
 import co.neweden.enhancedchat.EnhancedChat;
+import co.neweden.enhancedchat.chat.ChatManager;
+import co.neweden.enhancedchat.chat.Message;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
@@ -10,7 +12,7 @@ import net.md_5.bungee.api.plugin.Command;
 
 public class EmoteCommand extends Command {
 
-    EmoteCommand() {
+    public EmoteCommand() {
         super("emote", null, "me");
         ProxyServer.getInstance().getPluginManager().registerCommand(EnhancedChat.getPlugin(), this);
     }
