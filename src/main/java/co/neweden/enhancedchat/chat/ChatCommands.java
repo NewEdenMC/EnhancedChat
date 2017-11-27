@@ -9,64 +9,79 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
-public class ChannelCommands extends Command {
+public class ChatCommands extends Command {
 
-    protected ChannelCommands() {
-        super("channel", null, "ch");
+    protected ChatCommands() {
+        super("ch", null, "chat", "channel");
         ProxyServer.getInstance().getPluginManager().registerCommand(EnhancedChat.getPlugin(), this);
     }
 
     public void execute(CommandSender sender, String[] args) {
-        if (!(sender instanceof ProxiedPlayer)) {
-            sender.sendMessage(new ComponentBuilder("Only Players can run channel commands.").color(ChatColor.RED).create()); return;
-        }
-
-        ProxiedPlayer player = (ProxiedPlayer) sender;
-
         if (args.length < 1) {
-            player.sendMessage(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&',
+            sender.sendMessage(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&',
                     "&fChannel Sub-Commands:\n" +
                     "&f- &blist&f: Show a list of channels available to you\n" +
                     "&f- &bjoin {CHANNEL-NAME]&f: Join the specified channel\n" +
                     "&f- &bleave {CHANNEL-NAME]&f: Leave the specified channel\n" +
-                    "&f- &b{CHANNEL-NAME]&f: Change the channel you are currently speaking in to another channel\n"
+                    "&f- &b{CHANNEL-NAME]&f: Change the channel you are currently speaking in to another channel"
             ))); return;
         }
 
         switch (args[0].toLowerCase()) {
-            case "list" : list(player); break;
-            case "join" : join(player, args); break;
-            case "leave" : leave(player, args); break;
-            default: change(player, args); break;
+            case "list" : list(sender); break;
+            case "join" : join(sender, args); break;
+            case "leave" : leave(sender, args); break;
+            default: change(sender, args); break;
         }
     }
 
-    private void list(ProxiedPlayer player) {
-        StringBuilder out = new StringBuilder("&fAvailable Channels:\n");
+    private void list(CommandSender sender) {
+        ProxiedPlayer player = null;
+        if (sender instanceof ProxiedPlayer)
+            player = (ProxiedPlayer) sender;
+
+        StringBuilder out = new StringBuilder(player != null ? "&fAvailable Channels:" : "&fChannel List:");
 
         int size = 0;
         for (Channel channel : ChatManager.getChannels()) {
-            boolean joined = channel.getChatters().contains(player);
-            if (!channel.canJoin(player) && !joined) continue;
-            out.append("&f[").append(channel.getShortName()).append("] ")
-                    .append(channel.getName()).append(joined ? " &a+" : " &c-");
-            if (channel.equals(ChatManager.getActiveChannel(player))) out.append(" &e*");
-            out.append('\n');
+            boolean joined = false;
+            boolean active = false;
+            if (player != null) {
+                joined = channel.getChatters().contains(player);
+                if (!channel.canJoin(player) && !joined) continue;
+                active = channel.equals(ChatManager.getActiveChannel(player));
+            }
+
+            out.append('\n')
+               .append("&f[").append(channel.getShortName()).append("] ")
+               .append(channel.getName());
+
+            if (player != null)
+                out.append(joined ? " &a+" : " &c-")
+                   .append(active ? " &e*" : "");
+
             size++;
         }
-        out.append('\n');
 
-        out.append("&7&o'&a&o+&7&o' after a channel means you have joined that channel\n");
-        out.append("&7&o'&c&o-&7&o' after a channel manes you have not joined that channel\n");
-        out.append("&7&o'&e&o*&7&o' after a channel means this is the channel you are talking in");
+        if (player != null) {
+            out.append('\n').append('\n');
+            out.append("&7&o'&a&o+&7&o' after a channel means you have joined that channel\n");
+            out.append("&7&o'&c&o-&7&o' after a channel manes you have not joined that channel\n");
+            out.append("&7&o'&e&o*&7&o' after a channel means this is the channel you are talking in");
+        }
 
         if (size == 0)
             out = new StringBuilder("&7&oThere are no channels available :(");
 
-        player.sendMessage(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', out.toString())));
+        sender.sendMessage(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', out.toString())));
     }
 
-    private void join(ProxiedPlayer player, String[] args) {
+    private void join(CommandSender sender, String[] args) {
+        if (!(sender instanceof ProxiedPlayer)) {
+            sender.sendMessage(new ComponentBuilder("Only Players can join channels.").color(ChatColor.RED).create()); return;
+        }
+        ProxiedPlayer player = (ProxiedPlayer) sender;
+
         if (args.length < 2) {
             player.sendMessage(new ComponentBuilder("You need to specify which channel you would like to join.").color(ChatColor.RED).create()); return;
         }
@@ -83,7 +98,12 @@ public class ChannelCommands extends Command {
         channel.joinPlayer(player);
     }
 
-    private void leave(ProxiedPlayer player, String[] args) {
+    private void leave(CommandSender sender, String[] args) {
+        if (!(sender instanceof ProxiedPlayer)) {
+            sender.sendMessage(new ComponentBuilder("Only Players can leave channels.").color(ChatColor.RED).create()); return;
+        }
+        ProxiedPlayer player = (ProxiedPlayer) sender;
+
         if (args.length < 2) {
             player.sendMessage(new ComponentBuilder("You need to specify which channel you would like to leave.").color(ChatColor.RED).create()); return;
         }
@@ -96,7 +116,12 @@ public class ChannelCommands extends Command {
         channel.removePlayer(player);
     }
 
-    private void change(ProxiedPlayer player, String[] args) {
+    private void change(CommandSender sender, String[] args) {
+        if (!(sender instanceof ProxiedPlayer)) {
+            sender.sendMessage(new ComponentBuilder("Only Players can change channels.").color(ChatColor.RED).create()); return;
+        }
+        ProxiedPlayer player = (ProxiedPlayer) sender;
+
         if (args.length < 1) {
             player.sendMessage(new ComponentBuilder("You need to specify which channel you would like to change to.").color(ChatColor.RED).create()); return;
         }

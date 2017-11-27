@@ -37,7 +37,7 @@ public class ChatManager {
         if (eventHandler != null)
             ProxyServer.getInstance().getPluginManager().unregisterListener(eventHandler);
         eventHandler = new EventListener();
-        new ChannelCommands(); new EmoteCommand();
+        new ChatCommands(); new EmoteCommand();
         pmm = new PrivateMessageManager();
 
         discordEnabled = config.getBoolean("discord_integration.enabled", false);
