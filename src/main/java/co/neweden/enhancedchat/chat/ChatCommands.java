@@ -4,10 +4,13 @@ import co.neweden.enhancedchat.EnhancedChat;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
+
+import java.util.Collection;
 
 public class ChatCommands extends Command {
 
@@ -36,44 +39,58 @@ public class ChatCommands extends Command {
     }
 
     private void list(CommandSender sender) {
+        Collection<Channel> channels = ChatManager.getChannels();
+
+        if (channels.size() == 0) {
+            sender.sendMessage(new ComponentBuilder("There are no channels available :(").color(ChatColor.GRAY).italic(true).create());
+            return;
+        }
+
         ProxiedPlayer player = null;
         if (sender instanceof ProxiedPlayer)
             player = (ProxiedPlayer) sender;
 
-        StringBuilder out = new StringBuilder(player != null ? "&fAvailable Channels:" : "&fChannel List:");
+        ComponentBuilder out = new ComponentBuilder(player != null ? "Available Channels:" : "Channel List:").color(ChatColor.WHITE);
 
-        int size = 0;
         for (Channel channel : ChatManager.getChannels()) {
             boolean joined = false;
-            boolean active = false;
             if (player != null) {
                 joined = channel.getChatters().contains(player);
                 if (!channel.canJoin(player) && !joined) continue;
-                active = channel.equals(ChatManager.getActiveChannel(player));
             }
 
-            out.append('\n')
-               .append("&f[").append(channel.getShortName()).append("] ")
-               .append(channel.getName());
+            out.append("\n[" + channel.getShortName() + "] " + channel.getName()).color(ChatColor.WHITE);
 
-            if (player != null)
-                out.append(joined ? " &a+" : " &c-")
-                   .append(active ? " &e*" : "");
+            if (player != null) {
+                if (joined)
+                    out.append(" +").color(ChatColor.GREEN);
+                else
+                    out.append(" -").color(ChatColor.RED);
 
-            size++;
+                if (channel.equals(ChatManager.getActiveChannel(player)))
+                    out.append(" *").color(ChatColor.YELLOW);
+            }
         }
 
-        if (player != null) {
-            out.append('\n').append('\n');
-            out.append("&7&o'&a&o+&7&o' after a channel means you have joined that channel\n");
-            out.append("&7&o'&c&o-&7&o' after a channel manes you have not joined that channel\n");
-            out.append("&7&o'&e&o*&7&o' after a channel means this is the channel you are talking in");
+        sender.sendMessage(out.create());
+
+        if (player == null) return;
+
+        ChatColor[] symbolColor = new ChatColor[3];
+        String[] symbol = new String[3];
+        String[] desc = new String[3];
+
+        symbolColor[0] = ChatColor.GREEN;  symbol[0] = "+"; desc[0] = "after a channel means you have joined that channel\n";
+        symbolColor[1] = ChatColor.RED;    symbol[1] = "-"; desc[1] = "after a channel means you have not joined that channel\n";
+        symbolColor[2] = ChatColor.YELLOW; symbol[2] = "*"; desc[2] = "after a channel means this is the channel you are talking in";
+
+        TextComponent help = new TextComponent("\n"); help.setColor(ChatColor.GRAY); help.setItalic(true);
+        for (int i = 0; i < 3; i++) {
+            TextComponent tcsymbol = new TextComponent(symbol[i]); tcsymbol.setColor(symbolColor[i]);
+            help.addExtra("'"); help.addExtra(tcsymbol); help.addExtra("'");
+            help.addExtra(" " + desc[i]);
         }
-
-        if (size == 0)
-            out = new StringBuilder("&7&oThere are no channels available :(");
-
-        sender.sendMessage(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', out.toString())));
+        sender.sendMessage(help);
     }
 
     private void join(CommandSender sender, String[] args) {
