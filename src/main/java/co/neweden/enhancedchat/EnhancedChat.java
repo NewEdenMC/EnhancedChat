@@ -35,7 +35,7 @@ public class EnhancedChat {
 
     public static boolean isDBConnected() { return db != null; }
 
-    protected static Connection getDB() { return db; }
+    public static Connection getDB() { return db; }
 
     public static Path evalPath(String path) throws InvalidPathException {
         if (path.equals(""))

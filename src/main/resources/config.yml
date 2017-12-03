@@ -45,9 +45,16 @@ mysql:
    user: mc
    password:
 
+custom_tokens:
+  enabled: false
+  tokens:
+     nick:
+        aliases: [nickname, name, displayname]
+        players_enabled: true
+        groups_enabled: false
+
 chat:
   enabled: false
-  enable_database_dependent_features: true
   private_messaging:
     message_format: '&c[%fromDisplayName% -> %toDisplayName%] &f%message%'
     me_format: '&7&ome&c'
