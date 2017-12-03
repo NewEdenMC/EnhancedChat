@@ -31,7 +31,9 @@ public class CustomTokens {
             boolean groupsEnabled = tokenConfig.getBoolean("groups_enabled", false);
             if (!playersEnabled && !groupsEnabled) continue;
 
-            Token token = new Token(name, playersEnabled, groupsEnabled);
+            String label = tokenConfig.getString("label", null);
+
+            Token token = new Token(name, label, playersEnabled, groupsEnabled);
 
             try {
                 if (playersEnabled)
@@ -51,6 +53,9 @@ public class CustomTokens {
                     continue;
                 }
             }
+
+            if (tokenConfig.getBoolean("enable_player_command", true))
+                new Commands(token, name, tokenConfig.getStringList("aliases"));
 
             tokens.put(name, token);
 

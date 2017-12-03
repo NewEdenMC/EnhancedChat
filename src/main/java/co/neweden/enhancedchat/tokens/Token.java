@@ -1,6 +1,7 @@
 package co.neweden.enhancedchat.tokens;
 
 import co.neweden.enhancedchat.EnhancedChat;
+import co.neweden.enhancedchat.StringEval;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.sql.PreparedStatement;
@@ -15,14 +16,16 @@ public class Token {
 
     private String name;
     private String machineName;
+    private String label;
     private boolean playersEnabled;
     private boolean groupsEnabled;
-    Map<UUID, String> playersCache = new HashMap<>();
-    Map<String, String> groupsCache = new HashMap<>();
+    private Map<UUID, String> playersCache = new HashMap<>();
+    private Map<String, String> groupsCache = new HashMap<>();
 
-    Token(String name, boolean playersEnabled, boolean groupsEnabled) {
+    Token(String name, String label, boolean playersEnabled, boolean groupsEnabled) {
         this.name = name;
         machineName = "token_" + name;
+        this.label = label != null ? label : name;
         this.playersEnabled = playersEnabled;
         this.groupsEnabled = groupsEnabled;
     }
@@ -31,11 +34,19 @@ public class Token {
 
     public String getMachineName() { return machineName; }
 
+    public String getLabel() { return label; }
+
     public boolean isPlayersEnabled() { return playersEnabled; }
 
     public boolean isGroupsEnabled() { return groupsEnabled; }
 
-    public String getValue(ProxiedPlayer player) {
+    public StringEval getValue(ProxiedPlayer player) {
+        String value = getRawValue(player);
+        if (value == null) return null;
+        return new StringEval(value);
+    }
+
+    public String getRawValue(ProxiedPlayer player) {
         // When checking playersCache and groupsCache we specifically check for the key and if the value is null
         // as sometimes the cache may contain the key but the value may be null
         String pValue = playersCache.get(player.getUniqueId());

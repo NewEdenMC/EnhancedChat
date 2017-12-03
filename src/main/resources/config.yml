@@ -49,7 +49,9 @@ custom_tokens:
   enabled: false
   tokens:
      nick:
+        label: nickname
         aliases: [nickname, name, displayname]
+        enable_player_command: true
         players_enabled: true
         groups_enabled: false
 
