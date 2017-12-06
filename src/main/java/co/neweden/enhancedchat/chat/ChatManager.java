@@ -4,6 +4,8 @@ import co.neweden.enhancedchat.EnhancedChat;
 import co.neweden.enhancedchat.chat.commands.ChatCommands;
 import co.neweden.enhancedchat.chat.commands.EmoteCommand;
 import co.neweden.enhancedchat.chat.privatemessage.PrivateMessageManager;
+import co.neweden.enhancedchat.tokens.CustomTokens;
+import co.neweden.enhancedchat.tokens.Token;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -21,12 +23,15 @@ public class ChatManager {
     private static boolean discordEnabled = false;
     private static Channel discordStatusChannel = null;
     private static DiscordBot discordBot = null;
+    private static Token displayNameOverrideToken;
 
     public ChatManager() {
         channels.clear();
         talkingIn.clear();
         Configuration config = EnhancedChat.getConfig().getSection("chat");
         if (!config.getBoolean("enabled", false)) return;
+
+        displayNameOverrideToken = CustomTokens.getToken(config.getString("display_name_override_token", null));
 
         Iterator<String> keys = new LinkedList<>(config.getSection("channels").getKeys()).descendingIterator();
         while (keys.hasNext()) {
@@ -96,5 +101,7 @@ public class ChatManager {
     public static Channel getDiscordStatusChannel() { return discordStatusChannel; }
 
     public static DiscordBot getDiscordBot() { return discordBot; }
+
+    public static Token getDisplayNameOverrideToken() { return displayNameOverrideToken; }
 
 }

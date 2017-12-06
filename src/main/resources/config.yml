@@ -57,6 +57,7 @@ custom_tokens:
 
 chat:
   enabled: false
+  display_name_override_token: nick
   private_messaging:
     message_format: '&c[%fromDisplayName% -> %toDisplayName%] &f%message%'
     me_format: '&7&ome&c'

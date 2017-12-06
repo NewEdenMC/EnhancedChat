@@ -1,6 +1,8 @@
 package co.neweden.enhancedchat.chat;
 
 import co.neweden.enhancedchat.EnhancedChat;
+import co.neweden.enhancedchat.StringEval;
+import co.neweden.enhancedchat.tokens.Token;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -110,18 +112,19 @@ public class Channel {
     }
 
     public void sendMessage(ProxiedPlayer from, Message.Source source, Message.Format format, String message) {
-        processMessage(from.getDisplayName(), from.getUniqueId(), source, format, message);
+        Token dnot = ChatManager.getDisplayNameOverrideToken();
+        StringEval fromEvalName = null;
+        if (dnot != null)
+             fromEvalName = dnot.getValue(from);
+
+        processMessage(from.getDisplayName(), fromEvalName, from.getUniqueId(), source, format, message);
     }
 
     public void sendMessage(String from, Message.Source source, Message.Format format, String message) {
-        processMessage(from, null, source, format, message);
+        processMessage(from, null, null, source, format, message);
     }
 
-    private void processMessage(String fromName, UUID uuid, Message.Source source, Message.Format format, String message) {
-        Map<String, String> tokens = new HashMap<>();
-        tokens.put("%chShortName%", getShortName());
-        tokens.put("%displayName%", fromName);
-        tokens.put("%message%", message);
+    private void processMessage(String fromName, StringEval fromEvalName, UUID uuid, Message.Source source, Message.Format format, String message) {
         String formatting = "";
         if (source == Message.Source.PLAYER) {
             switch (format) {
@@ -132,9 +135,18 @@ public class Channel {
         } else if (source == Message.Source.DISCORD)
             formatting = getFormatDiscordNormal();
 
-        TextComponent out = EnhancedChat.evalMessage(formatting, tokens).getTextComponent();
+        StringEval out = EnhancedChat.evalMessage(formatting);
+
+        if (fromEvalName != null)
+            out.addToken("%displayName%", fromEvalName);
+        else
+            out.addToken("%displayName%", fromName);
+
+        out.addToken("%chShortName%", getShortName());
+        out.addToken("%message%", message);
+
         for (ProxiedPlayer player : getChatters()) {
-            player.sendMessage(out);
+            player.sendMessage(out.getTextComponent());
         }
     }
 
