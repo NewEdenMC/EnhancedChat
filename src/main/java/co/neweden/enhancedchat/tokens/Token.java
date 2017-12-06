@@ -49,29 +49,38 @@ public class Token {
     public String getRawValue(ProxiedPlayer player) {
         // When checking playersCache and groupsCache we specifically check for the key and if the value is null
         // as sometimes the cache may contain the key but the value may be null
-        String pValue = playersCache.get(player.getUniqueId());
-        if (playersCache.containsKey(player.getUniqueId()) && pValue != null)
-            return pValue;
+        if (isPlayersEnabled()) {
+            String pValue = playersCache.get(player.getUniqueId());
+            if (playersCache.containsKey(player.getUniqueId()) && pValue != null)
+                return pValue;
+        }
 
         String group = null; // add groups later
 
-        // Last attempt to check the cache
-        String gValue = groupsCache.get(group);
-        // If no cached value for player now we check group cache
-        if (gValue != null)
-            return gValue;
+        if (isGroupsEnabled()) {
+            // Last attempt to check the cache
+            String gValue = groupsCache.get(group);
+            // If no cached value for player now we check group cache
+            if (gValue != null)
+                return gValue;
 
-        // We don't need to start doing DB Queries if the last attempt to check the cache did have a key but returned null
-        if (groupsCache.containsKey(group)) return null;
+            // We don't need to start doing DB Queries if the last attempt to check the cache did have a key but returned null
+            if (groupsCache.containsKey(group)) return null;
+        }
 
         // The cache has nothing that is relevant, populate cache from database and return a value
-        String dbPValue = getValueFromDB("players", "uuid", player.getUniqueId().toString(), "Players");
-        playersCache.put(player.getUniqueId(), dbPValue);
-        if (dbPValue != null) return dbPValue;
+        if (isPlayersEnabled()) {
+            String dbPValue = getValueFromDB("players", "uuid", player.getUniqueId().toString(), "Players");
+            playersCache.put(player.getUniqueId(), dbPValue);
+            if (dbPValue != null) return dbPValue;
+        }
 
-        String dbGValue = getValueFromDB("groups", "name", group, "Groups");
-        playersCache.put(player.getUniqueId(), dbGValue);
-        return dbGValue;
+        if (isGroupsEnabled()) {
+            String dbGValue = getValueFromDB("groups", "name", group, "Groups");
+            playersCache.put(player.getUniqueId(), dbGValue);
+            return dbGValue;
+        }
+        return null;
     }
 
     private String getValueFromDB(String tokenValueType, String keyColumn, String keyValue, String tokenValueTypeHuman) {
@@ -85,7 +94,7 @@ public class Token {
             rs.next();
             return rs.getString(column);
         } catch (SQLException e) {
-            EnhancedChat.getLogger().log(Level.SEVERE, "A SQL Exception occurred while trying to get the " + tokenValueTypeHuman + " Token Value for " + tokenValueTypeHuman + " '" + keyValue + "', for Token '" + getName() + "', in table '" + table + "', at column '" + getMachineName() + "'");
+            EnhancedChat.getLogger().log(Level.SEVERE, "A SQL Exception occurred while trying to get the " + tokenValueTypeHuman + " Token Value for " + tokenValueTypeHuman + " '" + keyValue + "', for Token '" + getName() + "', in table '" + table + "', at column '" + getMachineName() + "'", e);
         }
         return null;
     }
