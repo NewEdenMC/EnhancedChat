@@ -49,18 +49,27 @@ public class Commands extends Command {
                 state = "change";
             }
             player.sendMessage(new ComponentBuilder("To " + state + " your " + token.getLabel() + " running this command again followed by the " + token.getLabel() + " you want to use").color(ChatColor.AQUA).create());
+            if (state.equals("change"))
+                player.sendMessage(new ComponentBuilder("To remove your " + token.getLabel() + " use: /" + getName() + " off").color(ChatColor.GRAY).italic(true).create());
             return;
         }
 
-        StringBuilder valueSB = new StringBuilder();
-        for (int i = 0; i < args.length; i++) {
-            valueSB.append(args[i]);
-            if (args.length - 1 != i) valueSB.append(' ');
+        String action;
+        boolean success;
+        if (args[0].equalsIgnoreCase("off") || args[0].equalsIgnoreCase("remove")) {
+            success = token.setPlayerValue(player, null);
+            action = "remove";
+        } else {
+            success = buildSetToken(player, args);
+            action = "set";
+        }
+        if (!success) {
+            player.sendMessage(new ComponentBuilder("Failed to " + action + " your " + token.getLabel() + ", please contact a member of staff.").color(ChatColor.RED).create());
+            return;
         }
 
-        boolean success = token.setPlayerValue(player, valueSB.toString());
-        if (!success) {
-            player.sendMessage(new ComponentBuilder("Failed to set set your " + token.getLabel() + ", please contact a member of staff.").color(ChatColor.RED).create());
+        if (action.equals("remove")) {
+            player.sendMessage(new ComponentBuilder("Your " + token.getLabel() + " has been removed.").color(ChatColor.BLUE).create());
             return;
         }
 
@@ -80,6 +89,16 @@ public class Commands extends Command {
         message.addExtra(newValue);
         message.setColor(ChatColor.AQUA);
         player.sendMessage(message);
+        player.sendMessage(new ComponentBuilder("To remove your " + token.getLabel() + " use: /" + getName() + " off").color(ChatColor.GRAY).italic(true).create());
+    }
+
+    private boolean buildSetToken(ProxiedPlayer player, String[] args) {
+        StringBuilder valueSB = new StringBuilder();
+        for (int i = 0; i < args.length; i++) {
+            valueSB.append(args[i]);
+            if (args.length - 1 != i) valueSB.append(' ');
+        }
+        return token.setPlayerValue(player, valueSB.toString());
     }
 
     static void adminExecute(Token token, CommandSender sender, String[] args) {
