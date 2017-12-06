@@ -51,6 +51,35 @@ public class Commands extends Command {
             player.sendMessage(new ComponentBuilder("To " + state + " your " + token.getLabel() + " running this command again followed by the " + token.getLabel() + " you want to use").color(ChatColor.AQUA).create());
             return;
         }
+
+        StringBuilder valueSB = new StringBuilder();
+        for (int i = 0; i < args.length; i++) {
+            valueSB.append(args[i]);
+            if (args.length - 1 != i) valueSB.append(' ');
+        }
+
+        boolean success = token.setPlayerValue(player, valueSB.toString());
+        if (!success) {
+            player.sendMessage(new ComponentBuilder("Failed to set set your " + token.getLabel() + ", please contact a member of staff.").color(ChatColor.RED).create());
+            return;
+        }
+
+        TextComponent newValue = new TextComponent(token.getValue(player).getTextComponent());
+        newValue.setColor(ChatColor.YELLOW);
+
+        TextComponent message = new TextComponent("Your " + token.getLabel());
+        if (currentValue != null) {
+            TextComponent old = new TextComponent(currentValue.getTextComponent());
+            old.setColor(ChatColor.YELLOW);
+            message.addExtra(" has been changed from ");
+            message.addExtra(old);
+            message.addExtra(" to ");
+        } else {
+            message.addExtra(" has been set to ");
+        }
+        message.addExtra(newValue);
+        message.setColor(ChatColor.AQUA);
+        player.sendMessage(message);
     }
 
     static void adminExecute(Token token, CommandSender sender, String[] args) {

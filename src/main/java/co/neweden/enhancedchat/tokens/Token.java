@@ -90,7 +90,7 @@ public class Token {
         return null;
     }
 
-    public void setPlayerValue(ProxiedPlayer player, String value) {
+    public boolean setPlayerValue(ProxiedPlayer player, String value) {
         try {
             PreparedStatement st = EnhancedChat.getDB().prepareStatement("INSERT INTO `tokens_players` (uuid, " + getMachineName() + ") VALUES (?, ?) ON DUPLICATE KEY UPDATE " + getMachineName() + "=?");
             st.setString(1, player.getUniqueId().toString());
@@ -99,9 +99,11 @@ public class Token {
             st.executeUpdate();
         } catch (SQLException e) {
             EnhancedChat.getLogger().log(Level.SEVERE, "An SQL Exception occurred while setting player token '" + getName() + "' to '" + value + "' for player " + player.getUniqueId());
+            return false;
         }
         if (playersCache.containsKey(player.getUniqueId()))
             playersCache.put(player.getUniqueId(), value);
+        return true;
     }
 
     public void setGroupValue(String group, String value) {
