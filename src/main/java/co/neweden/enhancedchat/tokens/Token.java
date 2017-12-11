@@ -2,7 +2,6 @@ package co.neweden.enhancedchat.tokens;
 
 import co.neweden.enhancedchat.EnhancedChat;
 import co.neweden.enhancedchat.StringEval;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -40,18 +39,18 @@ public class Token {
 
     public boolean isGroupsEnabled() { return groupsEnabled; }
 
-    public StringEval getValue(ProxiedPlayer player) {
-        String value = getRawValue(player);
+    public StringEval getValue(UUID uuid) {
+        String value = getRawValue(uuid);
         if (value == null) return null;
         return new StringEval(value);
     }
 
-    public String getRawValue(ProxiedPlayer player) {
+    public String getRawValue(UUID uuid) {
         // When checking playersCache and groupsCache we specifically check for the key and if the value is null
         // as sometimes the cache may contain the key but the value may be null
         if (isPlayersEnabled()) {
-            String pValue = playersCache.get(player.getUniqueId());
-            if (playersCache.containsKey(player.getUniqueId()) && pValue != null)
+            String pValue = playersCache.get(uuid);
+            if (playersCache.containsKey(uuid) && pValue != null)
                 return pValue;
         }
 
@@ -70,14 +69,14 @@ public class Token {
 
         // The cache has nothing that is relevant, populate cache from database and return a value
         if (isPlayersEnabled()) {
-            String dbPValue = getValueFromDB("players", "uuid", player.getUniqueId().toString(), "Players");
-            playersCache.put(player.getUniqueId(), dbPValue);
+            String dbPValue = getValueFromDB("players", "uuid", uuid.toString(), "Players");
+            playersCache.put(uuid, dbPValue);
             if (dbPValue != null) return dbPValue;
         }
 
         if (isGroupsEnabled()) {
             String dbGValue = getValueFromDB("groups", "name", group, "Groups");
-            playersCache.put(player.getUniqueId(), dbGValue);
+            playersCache.put(uuid, dbGValue);
             return dbGValue;
         }
         return null;
@@ -99,19 +98,19 @@ public class Token {
         return null;
     }
 
-    public boolean setPlayerValue(ProxiedPlayer player, String value) {
+    public boolean setPlayerValue(UUID uuid, String value) {
         try {
             PreparedStatement st = EnhancedChat.getDB().prepareStatement("INSERT INTO `tokens_players` (uuid, " + getMachineName() + ") VALUES (?, ?) ON DUPLICATE KEY UPDATE " + getMachineName() + "=?");
-            st.setString(1, player.getUniqueId().toString());
+            st.setString(1, uuid.toString());
             st.setString(2, value);
             st.setString(3, value);
             st.executeUpdate();
         } catch (SQLException e) {
-            EnhancedChat.getLogger().log(Level.SEVERE, "An SQL Exception occurred while setting player token '" + getName() + "' to '" + value + "' for player " + player.getUniqueId());
+            EnhancedChat.getLogger().log(Level.SEVERE, "An SQL Exception occurred while setting player token '" + getName() + "' to '" + value + "' for player " + uuid);
             return false;
         }
-        if (playersCache.containsKey(player.getUniqueId()))
-            playersCache.put(player.getUniqueId(), value);
+        if (playersCache.containsKey(uuid))
+            playersCache.put(uuid, value);
         return true;
     }
 
