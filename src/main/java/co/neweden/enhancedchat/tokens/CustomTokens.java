@@ -39,7 +39,7 @@ public class CustomTokens {
                 if (playersEnabled)
                     EnhancedChat.getDB().createStatement().execute("ALTER TABLE `tokens_players` ADD COLUMN `" + token.getMachineName() + "` VARCHAR(45) NULL;");
             } catch (SQLException e) {
-                if (!e.getSQLState().equals("42S21")) {
+                if   (!e.getSQLState().equals("42S21")) {
                     EnhancedChat.getLogger().log(Level.SEVERE, "An SQL Exception occurred while trying to add the Players Token Column ('" + token.getMachineName() + "' in table 'tokens_players') for Token '" + token.getName() + "'", e);
                     continue;
                 }
@@ -55,7 +55,7 @@ public class CustomTokens {
             }
 
             if (tokenConfig.getBoolean("enable_player_command", true))
-                new Commands(token, name, tokenConfig.getStringList("aliases"));
+                new Commands(token, tokenConfig.getStringList("aliases"));
 
             tokens.put(name, token);
 

@@ -18,8 +18,8 @@ public class Commands extends Command {
 
     Token token;
 
-    Commands(Token token, String name, List<String> aliases) {
-        super(name, "enhancedchat.token." + name, aliases.toArray(new String[0]));
+    Commands(Token token, List<String> aliases) {
+        super(token.getName(), "enhancedchat.token." + token.getName(), aliases.toArray(new String[0]));
         this.token = token;
         ProxyServer.getInstance().getPluginManager().registerCommand(EnhancedChat.getPlugin(), this);
     }
