@@ -12,6 +12,7 @@ import net.md_5.bungee.api.plugin.Command;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 public class Commands extends Command {
 
@@ -23,60 +24,66 @@ public class Commands extends Command {
         ProxyServer.getInstance().getPluginManager().registerCommand(EnhancedChat.getPlugin(), this);
     }
 
-    public void execute(CommandSender sender, String[] args) { userExecute(sender, args); }
-
-    private void userExecute(CommandSender sender, String[] args) {
+    public void execute(CommandSender sender, String[] args) {
         if (!(sender instanceof ProxiedPlayer)) {
             sender.sendMessage(new ComponentBuilder("Only Players can run this command.").color(ChatColor.RED).create());
             return;
         }
 
         ProxiedPlayer player = (ProxiedPlayer) sender;
-        StringEval currentValue = token.getValue(player);
+        runCommand(token, sender, player.getUniqueId(), player.getDisplayName(), "/" + getName(), args);
+    }
 
-        if (args.length <= 0) {
+    private static void runCommand(Token token, CommandSender sender, UUID target, String targetName, String command, String... value) {
+        boolean self = sender instanceof ProxiedPlayer && ((ProxiedPlayer) sender).getUniqueId().equals(target);
+        String nameWS = targetName + " ";
+        String qNameWS = targetName + "'s ";
+        StringEval currentValue = token.getValue(target);
+        ComponentBuilder removeHelp = new ComponentBuilder("To remove " + (self ? "your" : qNameWS) + token.getLabel() + " use: " + command + " off").color(ChatColor.GRAY).italic(true);
+
+        if (value.length <= 0) {
             String state;
             if (currentValue == null) {
-                player.sendMessage(new ComponentBuilder("You do not currently have a " + token.getLabel() + " set.").color(ChatColor.AQUA).create());
+                sender.sendMessage(new ComponentBuilder((self ? "You do" : nameWS + "does") + " not currently have a " + token.getLabel() + " set.").color(ChatColor.AQUA).create());
                 state = "set";
             } else {
                 TextComponent current = new TextComponent(currentValue.getTextComponent());
                 current.setColor(ChatColor.YELLOW);
-                TextComponent message = new TextComponent("Your current " + token.getLabel() + " is: ");
+                TextComponent message = new TextComponent((self ? "Your " : qNameWS) + "current " + token.getLabel() + " is: ");
                 message.setColor(ChatColor.AQUA);
                 message.addExtra(current);
-                player.sendMessage(message);
+                sender.sendMessage(message);
                 state = "change";
             }
-            player.sendMessage(new ComponentBuilder("To " + state + " your " + token.getLabel() + " running this command again followed by the " + token.getLabel() + " you want to use").color(ChatColor.AQUA).create());
+            sender.sendMessage(new ComponentBuilder("To " + state + (self ? " your " : " " + qNameWS) + token.getLabel() + " run this command again followed by the " + token.getLabel() + " you want to use").color(ChatColor.AQUA).create());
             if (state.equals("change"))
-                player.sendMessage(new ComponentBuilder("To remove your " + token.getLabel() + " use: /" + getName() + " off").color(ChatColor.GRAY).italic(true).create());
+                sender.sendMessage(removeHelp.create());
             return;
         }
 
         String action;
         boolean success;
-        if (args[0].equalsIgnoreCase("off") || args[0].equalsIgnoreCase("remove")) {
-            success = token.setPlayerValue(player, null);
+        if (value[0].equalsIgnoreCase("off") || value[0].equalsIgnoreCase("remove")) {
+            success = token.setPlayerValue(target, null);
             action = "remove";
         } else {
-            success = buildSetToken(player, args);
+            success = buildSetToken(token, target, value);
             action = "set";
         }
         if (!success) {
-            player.sendMessage(new ComponentBuilder("Failed to " + action + " your " + token.getLabel() + ", please contact a member of staff.").color(ChatColor.RED).create());
+            sender.sendMessage(new ComponentBuilder("Failed to " + action + (self ? " your " : " " + qNameWS) + token.getLabel() + ", please contact a member of staff.").color(ChatColor.RED).create());
             return;
         }
 
         if (action.equals("remove")) {
-            player.sendMessage(new ComponentBuilder("Your " + token.getLabel() + " has been removed.").color(ChatColor.BLUE).create());
+            sender.sendMessage(new ComponentBuilder((self ? "Your " : qNameWS) + token.getLabel() + "has been removed.").color(ChatColor.BLUE).create());
             return;
         }
 
-        TextComponent newValue = new TextComponent(token.getValue(player).getTextComponent());
+        TextComponent newValue = new TextComponent(token.getValue(target).getTextComponent());
         newValue.setColor(ChatColor.YELLOW);
 
-        TextComponent message = new TextComponent("Your " + token.getLabel());
+        TextComponent message = new TextComponent((self ? "Your " : qNameWS) + token.getLabel());
         if (currentValue != null) {
             TextComponent old = new TextComponent(currentValue.getTextComponent());
             old.setColor(ChatColor.YELLOW);
@@ -88,17 +95,17 @@ public class Commands extends Command {
         }
         message.addExtra(newValue);
         message.setColor(ChatColor.AQUA);
-        player.sendMessage(message);
-        player.sendMessage(new ComponentBuilder("To remove your " + token.getLabel() + " use: /" + getName() + " off").color(ChatColor.GRAY).italic(true).create());
+        sender.sendMessage(message);
+        sender.sendMessage(removeHelp.create());
     }
 
-    private boolean buildSetToken(ProxiedPlayer player, String[] args) {
+    private static boolean buildSetToken(Token token, UUID uuid, String[] args) {
         StringBuilder valueSB = new StringBuilder();
         for (int i = 0; i < args.length; i++) {
             valueSB.append(args[i]);
             if (args.length - 1 != i) valueSB.append(' ');
         }
-        return token.setPlayerValue(player, valueSB.toString());
+        return token.setPlayerValue(uuid, valueSB.toString());
     }
 
     static void adminExecute(Token token, CommandSender sender, String[] args) {
