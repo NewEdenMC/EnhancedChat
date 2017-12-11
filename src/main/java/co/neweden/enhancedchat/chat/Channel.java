@@ -115,7 +115,7 @@ public class Channel {
         Token dnot = ChatManager.getDisplayNameOverrideToken();
         StringEval fromEvalName = null;
         if (dnot != null)
-             fromEvalName = dnot.getValue(from);
+             fromEvalName = dnot.getValue(from.getUniqueId());
 
         processMessage(from.getDisplayName(), fromEvalName, from.getUniqueId(), source, format, message);
     }
