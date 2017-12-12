@@ -9,10 +9,7 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.event.EventHandler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class Messages implements Listener {
@@ -61,8 +58,9 @@ public class Messages implements Listener {
 
         // We are looping through each config group in the order it is entered in the config
         // groupToUse will end up being the last group checked that the player has
+        Collection<String> groups = PlayerData.getGroups(player);
         for (String configGroup : configGroups.getKeys()) {
-            if (player.getGroups().contains(configGroup))
+            if (groups.contains(configGroup))
                 groupToUse = configGroup;
         }
 
