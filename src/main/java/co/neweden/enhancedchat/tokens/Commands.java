@@ -1,6 +1,7 @@
 package co.neweden.enhancedchat.tokens;
 
 import co.neweden.enhancedchat.EnhancedChat;
+import co.neweden.enhancedchat.PlayerData;
 import co.neweden.enhancedchat.StringEval;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
@@ -34,12 +35,24 @@ public class Commands extends Command {
         runCommand(token, sender, player.getUniqueId(), player.getDisplayName(), "/" + getName(), args);
     }
 
-    private static void runCommand(Token token, CommandSender sender, UUID target, String targetName, String command, String... value) {
+    static void adminExecute(Token token, CommandSender sender, String name, String... values) {
+        UUID uuid = PlayerData.getUUIDFromName(name);
+        if (uuid == null) {
+            sender.sendMessage(new ComponentBuilder("The player '" + name + "' is not online or hasn't connected before, remember their name is case-sensitive").color(ChatColor.RED).create());
+            return;
+        }
+        String helperCommand = token.getName(); // todo: decide first part of command
+        if (sender instanceof ProxiedPlayer)
+            helperCommand = "/" + helperCommand;
+        runCommand(token, sender, uuid, name, helperCommand, values);
+    }
+
+    private static void runCommand(Token token, CommandSender sender, UUID target, String targetName, String helperCommand, String... value) {
         boolean self = sender instanceof ProxiedPlayer && ((ProxiedPlayer) sender).getUniqueId().equals(target);
         String nameWS = targetName + " ";
         String qNameWS = targetName + "'s ";
         StringEval currentValue = token.getValue(target);
-        ComponentBuilder removeHelp = new ComponentBuilder("To remove " + (self ? "your" : qNameWS) + token.getLabel() + " use: " + command + " off").color(ChatColor.GRAY).italic(true);
+        ComponentBuilder removeHelp = new ComponentBuilder("To remove " + (self ? "your" : qNameWS) + token.getLabel() + " use: " + helperCommand + " off").color(ChatColor.GRAY).italic(true);
 
         if (value.length <= 0) {
             String state;
@@ -106,10 +119,6 @@ public class Commands extends Command {
             if (args.length - 1 != i) valueSB.append(' ');
         }
         return token.setPlayerValue(uuid, valueSB.toString());
-    }
-
-    static void adminExecute(Token token, CommandSender sender, String[] args) {
-
     }
 
     public void old(CommandSender sender, String[] args) {

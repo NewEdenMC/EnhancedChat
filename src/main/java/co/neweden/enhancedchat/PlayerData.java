@@ -1,10 +1,12 @@
 package co.neweden.enhancedchat;
 
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.UUID;
 
 public class PlayerData {
 
@@ -12,6 +14,20 @@ public class PlayerData {
 
     static void init() {
         groupsSource = EnhancedChat.getConfig().getString("groups_source", "bungee");
+    }
+
+    /**
+     * Will search current online players for a UUID corresponding to the name provided,
+     * if none is found and a Database Connection has been setup it tries to search the database for known UUIDs.
+     * As a result of only searching known UUIDs this method can't match UUIDs of players who have never connected
+     * or last connected before Enhanced Chat was first setup.
+     *
+     * @param username the username to search for
+     * @return a UUID matching the username provided or null if nothing could be found
+     */
+    public static UUID getUUIDFromName(String username) {
+        return ProxyServer.getInstance().getPlayer(username).getUniqueId();
+        // todo: add DB lookup
     }
 
     /**
