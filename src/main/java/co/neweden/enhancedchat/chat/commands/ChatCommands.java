@@ -40,7 +40,7 @@ public class ChatCommands extends Command {
         sender.sendMessage(new ComponentBuilder("Unknown sub-command").color(ChatColor.RED).create());
     }
 
-    private void help(CommandSender sender) {
+    private static void help(CommandSender sender) {
         sender.sendMessage(new ComponentBuilder("Chat Sub-Commands:").color(ChatColor.WHITE).create());
 
         String[] cmd = new String[4];
@@ -62,7 +62,7 @@ public class ChatCommands extends Command {
         }
     }
 
-    private void list(CommandSender sender) {
+    private static void list(CommandSender sender) {
         Collection<Channel> channels = ChatManager.getChannels();
 
         if (channels.size() == 0) {
@@ -117,7 +117,7 @@ public class ChatCommands extends Command {
         sender.sendMessage(help);
     }
 
-    private void join(CommandSender sender, String[] args) {
+    private static void join(CommandSender sender, String[] args) {
         if (!(sender instanceof ProxiedPlayer)) {
             sender.sendMessage(new ComponentBuilder("Only Players can join channels.").color(ChatColor.RED).create()); return;
         }
@@ -139,7 +139,7 @@ public class ChatCommands extends Command {
         channel.joinPlayer(player);
     }
 
-    private void leave(CommandSender sender, String[] args) {
+    private static void leave(CommandSender sender, String[] args) {
         if (!(sender instanceof ProxiedPlayer)) {
             sender.sendMessage(new ComponentBuilder("Only Players can leave channels.").color(ChatColor.RED).create()); return;
         }
@@ -157,7 +157,7 @@ public class ChatCommands extends Command {
         channel.removePlayer(player);
     }
 
-    private void change(CommandSender sender, String[] args) {
+    private static void change(CommandSender sender, String[] args) {
         if (!(sender instanceof ProxiedPlayer)) {
             sender.sendMessage(new ComponentBuilder("Only Players can change channels.").color(ChatColor.RED).create()); return;
         }
