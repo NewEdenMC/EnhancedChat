@@ -26,7 +26,8 @@ public class PlayerData {
      * @return a UUID matching the username provided or null if nothing could be found
      */
     public static UUID getUUIDFromName(String username) {
-        return ProxyServer.getInstance().getPlayer(username).getUniqueId();
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(username);
+        return player != null ? player.getUniqueId() : null;
         // todo: add DB lookup
     }
 
