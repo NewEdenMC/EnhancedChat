@@ -15,11 +15,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-public class Commands extends Command {
+public class TokenCommands extends Command {
 
     Token token;
 
-    Commands(Token token, List<String> aliases) {
+    TokenCommands(Token token, List<String> aliases) {
         super(token.getName(), "enhancedchat.token." + token.getName(), aliases.toArray(new String[0]));
         this.token = token;
         ProxyServer.getInstance().getPluginManager().registerCommand(EnhancedChat.getPlugin(), this);

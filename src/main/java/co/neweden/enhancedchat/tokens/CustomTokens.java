@@ -55,7 +55,7 @@ public class CustomTokens {
             }
 
             if (tokenConfig.getBoolean("enable_player_command", true))
-                new Commands(token, tokenConfig.getStringList("aliases"));
+                new TokenCommands(token, tokenConfig.getStringList("aliases"));
 
             tokens.put(name, token);
 
