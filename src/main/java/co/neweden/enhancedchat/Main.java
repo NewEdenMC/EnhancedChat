@@ -68,6 +68,7 @@ public class Main extends Plugin {
             else
                 getLogger().warning("Custom Tokens will not be enabled as a Database Connection could not be established.");
         }
+        PlayerData.init();
         new Messages(); new Commands(); new ChatManager();
         loadDynamicCommands();
         EnhancedChat.startUpLoad = false;
