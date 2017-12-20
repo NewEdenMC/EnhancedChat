@@ -1,11 +1,10 @@
 package co.neweden.enhancedchat;
 
+import co.neweden.enhancedchat.tokens.TokenCommands;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
 public class Commands extends Command {
@@ -22,16 +21,19 @@ public class Commands extends Command {
 
         switch (args[0].toLowerCase()) {
             case "reload" : reload(sender); return;
+            case "token" : TokenCommands.adminExecute(sender, args); return;
         }
     }
 
     private static void help(CommandSender sender) {
         sender.sendMessage(new ComponentBuilder("Enhanced Chat Admin Sub-Commands:").color(ChatColor.WHITE).create());
 
-        String[] cmd = new String[1];
-        String[] desc = new String[1];
+        String[] cmd = new String[3];
+        String[] desc = new String[3];
 
         cmd[0] = "reload"; desc[0] = "Reload the configuration and clear the cache";
+        cmd[1] = "token [TOKEN-NAME] player [PLAYER-NAME]"; desc[1] = "Get or set the Custom Token for the given Player";
+        cmd[2] = "token [TOKEN-NAME] group [GROUP-NAME]"; desc[2] = "Get or set the Custom Token for the given Group";
 
         for (int i = 0; i < cmd.length; i++) {
             sender.sendMessage(

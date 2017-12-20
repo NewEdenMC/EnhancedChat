@@ -35,16 +35,52 @@ public class TokenCommands extends Command {
         runCommand(token, sender, player.getUniqueId(), player.getDisplayName(), "/" + getName(), args);
     }
 
-    static void adminExecute(Token token, CommandSender sender, String name, String... values) {
-        UUID uuid = PlayerData.getUUIDFromName(name);
-        if (uuid == null) {
-            sender.sendMessage(new ComponentBuilder("The player '" + name + "' is not online or hasn't connected before, remember their name is case-sensitive").color(ChatColor.RED).create());
+    public static void adminExecute(CommandSender sender, String[] args) {
+        String help = "To get a token value: token [TOKEN-NAME] player/group [NAME]\nTo set a token value: token [TOKEN-NAME] player/group [NAME] [NEW-VALUE]";
+
+        if (args.length < 4) {
+            sender.sendMessage(new ComponentBuilder("Not enough arguments:\n" + help).color(ChatColor.GRAY).italic(true).create());
             return;
         }
-        String helperCommand = token.getName(); // todo: decide first part of command
-        if (sender instanceof ProxiedPlayer)
-            helperCommand = "/" + helperCommand;
-        runCommand(token, sender, uuid, name, helperCommand, values);
+
+        String type = args[2].toLowerCase();
+        if (!type.equals("player") && !type.equals("group")) {
+            sender.sendMessage(new ComponentBuilder("Third argument must be either \"player\" or \"group\":\n" + help).color(ChatColor.GRAY).italic(true).create());
+            return;
+        }
+
+        Token token = CustomTokens.getToken(args[1]);
+        if (token == null) {
+            sender.sendMessage(new ComponentBuilder("The token \"" + args[1] + "\" is not registered as a Custom Token.").color(ChatColor.RED).create());
+            return;
+        }
+
+        String[] newValue = Arrays.copyOfRange(args, 4, args.length);
+
+        if (type.equals("player")) {
+            if (!token.isPlayersEnabled()) {
+                sender.sendMessage(new ComponentBuilder("This token does not support values for Players.").color(ChatColor.RED).create()); return;
+            }
+
+            String name = args[3];
+            UUID uuid = PlayerData.getUUIDFromName(name);
+            if (uuid == null) {
+                sender.sendMessage(new ComponentBuilder("The player '" + name + "' is not online or hasn't connected before, remember their name is case-sensitive").color(ChatColor.RED).create());
+                return;
+            }
+            String helperCommand = token.getName(); // todo: decide first part of command
+            if (sender instanceof ProxiedPlayer)
+                helperCommand = "/" + helperCommand;
+            runCommand(token, sender, uuid, name, helperCommand, newValue);
+            return;
+        }
+
+        if (type.equals("group")) {
+            if (!token.isGroupsEnabled()) {
+                sender.sendMessage(new ComponentBuilder("This token does not support values for Groups.").color(ChatColor.RED).create()); return;
+            }
+            // todo: add group support
+        }
     }
 
     private static void runCommand(Token token, CommandSender sender, UUID target, String targetName, String helperCommand, String... value) {
