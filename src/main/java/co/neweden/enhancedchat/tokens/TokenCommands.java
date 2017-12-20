@@ -68,7 +68,7 @@ public class TokenCommands extends Command {
                 sender.sendMessage(new ComponentBuilder("The player '" + name + "' is not online or hasn't connected before, remember their name is case-sensitive").color(ChatColor.RED).create());
                 return;
             }
-            String helperCommand = token.getName(); // todo: decide first part of command
+            String helperCommand = "enhancedchat token " + token.getName() + " " + args[2] + " " + args[3];
             if (sender instanceof ProxiedPlayer)
                 helperCommand = "/" + helperCommand;
             runCommand(token, sender, uuid, name, helperCommand, newValue);
