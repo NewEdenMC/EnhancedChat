@@ -4,6 +4,7 @@ import co.neweden.enhancedchat.EnhancedChat;
 import co.neweden.enhancedchat.StringEval;
 import co.neweden.enhancedchat.tokens.Token;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -111,13 +112,19 @@ public class Channel {
         return Collections.unmodifiableCollection(chatters);
     }
 
-    public void sendMessage(ProxiedPlayer from, Message.Source source, Message.Format format, String message) {
+    public void sendMessage(CommandSender from, Message.Source source, Message.Format format, String message) {
+        UUID uuid = null;
+        String displayName = from.getName();
+        if (from instanceof ProxiedPlayer) {
+            uuid = ((ProxiedPlayer) from).getUniqueId();
+            displayName = ((ProxiedPlayer) from).getDisplayName();
+        }
         Token dnot = ChatManager.getDisplayNameOverrideToken();
         StringEval fromEvalName = null;
-        if (dnot != null)
-             fromEvalName = dnot.getValue(from.getUniqueId());
+        if (dnot != null && from instanceof ProxiedPlayer)
+             fromEvalName = dnot.getValue(uuid);
 
-        processMessage(from.getDisplayName(), fromEvalName, from.getUniqueId(), source, format, message);
+        processMessage(displayName, fromEvalName, uuid, source, format, message);
     }
 
     public void sendMessage(String from, Message.Source source, Message.Format format, String message) {
