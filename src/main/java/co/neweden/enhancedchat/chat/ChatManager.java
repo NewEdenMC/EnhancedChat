@@ -3,6 +3,7 @@ package co.neweden.enhancedchat.chat;
 import co.neweden.enhancedchat.EnhancedChat;
 import co.neweden.enhancedchat.chat.commands.ChatCommands;
 import co.neweden.enhancedchat.chat.commands.EmoteCommand;
+import co.neweden.enhancedchat.chat.commands.QuickMessageCommand;
 import co.neweden.enhancedchat.chat.privatemessage.PrivateMessageManager;
 import co.neweden.enhancedchat.tokens.CustomTokens;
 import co.neweden.enhancedchat.tokens.Token;
@@ -38,7 +39,9 @@ public class ChatManager {
             String key = keys.next();
             Configuration chConfig = config.getSection("channels." + key);
             if (!chConfig.getBoolean("enabled", true)) return;
-            channels.add(new Channel(key, chConfig, config.getSection("defaults")));
+            Channel channel = new Channel(key, chConfig, config.getSection("defaults"));
+            channels.add(channel);
+            new QuickMessageCommand(channel);
         }
 
         if (eventHandler != null)
