@@ -1,5 +1,7 @@
 package co.neweden.enhancedchat;
 
+import co.neweden.enhancedchat.playerdata.Group;
+import co.neweden.enhancedchat.playerdata.PlayerData;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -54,20 +56,21 @@ public class Messages implements Listener {
         if (configGroups.getKeys().size() == 0)
             return def;
 
-        String groupToUse = null;
+        Group groupToUse = null;
 
         // We are looping through each config group in the order it is entered in the config
         // groupToUse will end up being the last group checked that the player has
-        Collection<String> groups = PlayerData.getGroups(player);
+        Collection<Group> playerGroups = PlayerData.getGroupsForPlayer(player);
         for (String configGroup : configGroups.getKeys()) {
-            if (groups.contains(configGroup))
-                groupToUse = configGroup;
+            Group testGroup = PlayerData.getGroup(configGroup);
+            if (testGroup != null && playerGroups.contains(testGroup))
+                groupToUse = testGroup;
         }
 
         if (groupToUse == null)
             return def;
         else
-            return configGroups.getString(groupToUse, "");
+            return configGroups.getString(groupToUse.getName(), "");
     }
 
     public void startAnnouncements() {

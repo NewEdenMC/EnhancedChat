@@ -1,7 +1,7 @@
 package co.neweden.enhancedchat.tokens;
 
 import co.neweden.enhancedchat.EnhancedChat;
-import co.neweden.enhancedchat.PlayerData;
+import co.neweden.enhancedchat.playerdata.PlayerData;
 import co.neweden.enhancedchat.StringEval;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;

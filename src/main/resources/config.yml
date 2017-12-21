@@ -3,9 +3,13 @@ chat-motd:
    enabled: true
    file: chat-motd.txt
 
-# Where to query for a Player's Groups, available values are:
-# - 'bungee': query the built-in BungeeCord Permissions System Groups
-groups_source: bungee
+groups:
+  members:
+    rank: 10
+  moderators:
+    rank: 80
+  admins:
+    rank: 90
 
 # Customise the message that is displayed when a Player connects to the Proxy
 # You can set different messages per Group
