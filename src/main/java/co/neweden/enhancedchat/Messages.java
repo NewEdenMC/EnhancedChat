@@ -22,7 +22,7 @@ public class Messages implements Listener {
         startAnnouncements();
     }
 
-    @EventHandler
+    @EventHandler(priority = 6)
     public void onPostLogin(PostLoginEvent event) {
         if (EnhancedChat.getConfig().getBoolean("chat-motd.enabled", false)) {
             String chat_motd_file = EnhancedChat.getConfig().getString("chat-motd.file", "");
@@ -37,7 +37,7 @@ public class Messages implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = 6)
     public void onPlayerDisconnect(PlayerDisconnectEvent event) {
         if (EnhancedChat.getConfig().getBoolean("quit-messages.enabled", false)) {
             String message = getHighestStatusMessage("quit-messages", event.getPlayer());

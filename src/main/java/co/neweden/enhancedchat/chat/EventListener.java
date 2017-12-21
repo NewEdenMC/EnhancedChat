@@ -21,7 +21,7 @@ public class EventListener implements Listener {
         ProxyServer.getInstance().getPluginManager().registerListener(EnhancedChat.getPlugin(), this);
     }
 
-    @EventHandler
+    @EventHandler(priority = 6)
     public void onPostLogin(PostLoginEvent event) {
         Iterator<Channel> channels = new LinkedList<>(ChatManager.getChannels()).descendingIterator();
         Channel lastJoined = null;
@@ -51,7 +51,7 @@ public class EventListener implements Listener {
         ChatManager.sendMessageToActiveChannel(sender, Message.Format.NORMAL, event.getMessage());
     }
 
-    @EventHandler
+    @EventHandler(priority = 6)
     public void onPlayerDisconnect(PlayerDisconnectEvent event) {
         if (ChatManager.isDiscordEnabled()) {
             String message = Messages.getHighestStatusMessage("discord_status_messages.quit-messages", event.getPlayer());
