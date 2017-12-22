@@ -35,6 +35,7 @@ public class StringEval {
     private boolean isObfuscated = false;
     private int segmentWordStart = 0;
     private boolean inURL = false;
+    private boolean urlHasProto = false;
 
     private boolean stripFormatting = false;
     private boolean noEscape = false;
@@ -114,8 +115,9 @@ public class StringEval {
         if (isObfuscated) tc.setObfuscated(true);
         if (inURL) {
             String rawURL = segment.toString();
-            if (!rawURL.substring(0, 6).equalsIgnoreCase("http://") || !rawURL.substring(0, 7).equalsIgnoreCase("https://"))
+            if (!urlHasProto)
                 rawURL = "http://" + rawURL;
+            urlHasProto = false;
             tc.setUnderlined(underlineURLs);
             tc.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, rawURL));
             tc.setHoverEvent(new HoverEvent(
@@ -210,6 +212,15 @@ public class StringEval {
         char[] firstPart = new char[segment.length() - segmentWordStart];
         segment.getChars(segmentWordStart, segment.length(), firstPart, 0);
         segment.setLength(segment.length() - (segment.length() - segmentWordStart));
+
+        // we need to test if the first part of the URL has "://", in other words assuming the URL we are looking at
+        // is a valid URL, urlHashProto will be set to true if it the URL has "://" somewhere at the start
+        for (int fpI = 0; fpI < firstPart.length - 2; fpI++) {
+            if (firstPart[fpI] != ':' || firstPart[fpI + 1] != '/' || firstPart[fpI + 2] != '/')
+                continue;
+            urlHasProto = true;
+        }
+
         nextSegment();
         segment.append(firstPart).append('.');
         inURL = true;
