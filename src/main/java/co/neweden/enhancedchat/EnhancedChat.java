@@ -50,7 +50,7 @@ public class EnhancedChat {
     public static StringEval evalMessage(String message) { return evalMessage(message, null); }
     public static StringEval evalMessage(String message, Map<String, String> extraTokens) {
         Map<String, String> tokens = new HashMap<>();
-        tokens.put("%onlinePlayerCount%", String.valueOf(ProxyServer.getInstance().getOnlineCount()));
+        tokens.put("%onlinePlayerCount%", String.valueOf(ProxyServer.getInstance().getPlayers().size()));
         if (extraTokens != null)
             tokens.putAll(extraTokens);
 
