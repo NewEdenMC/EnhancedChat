@@ -133,7 +133,7 @@ public class ChatCommands extends Command {
         }
 
         if (channel.getChatters().contains(player)) {
-            player.sendMessage(new ComponentBuilder("You have already joined this channel, to change the channel you are talking in use '/ch " + args[0] + "' or to send a quick message using '/ch " + args[0] + " [YOUR-MESSAGE]'").color(ChatColor.GREEN).create()); return;
+            player.sendMessage(new ComponentBuilder("You have already joined this channel, to start talking in this channel use ").color(ChatColor.RED).append("/ch " + args[1]).color(ChatColor.GOLD).append(" or to send a quick message using ").color(ChatColor.RED).append("/" + channel.getShortName().toLowerCase() + " [YOUR-MESSAGE]'").color(ChatColor.GOLD).create()); return;
         }
 
         channel.joinPlayer(player);

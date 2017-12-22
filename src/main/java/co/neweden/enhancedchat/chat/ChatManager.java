@@ -94,7 +94,7 @@ public class ChatManager {
         if (activeChannel != null)
             activeChannel.sendMessage(from, Message.Source.PLAYER, formatting, message);
         else
-            from.sendMessage(new ComponentBuilder("Your chat message could not be sent as you are not in a channel, try joining one: use ").color(ChatColor.RED).append("/ch list").color(ChatColor.GOLD).append(" to see a list of channels and ").color(ChatColor.RED).append("/ch join NAME").color(ChatColor.GOLD).append(" to join a channel.").color(ChatColor.RED).create());
+            from.sendMessage(new ComponentBuilder("Your chat message could not be sent as you are not talking in any channel, try joining or setting your active channel: use ").color(ChatColor.RED).append("/ch list").color(ChatColor.GOLD).append(" to see a list of channels, ").color(ChatColor.RED).append("/ch NAME").color(ChatColor.GOLD).append(" to join and start talking in a channel").color(ChatColor.RED).create());
     }
 
     public static PrivateMessageManager getPrivateMessageManager() { return pmm; }
