@@ -58,13 +58,12 @@ public class Messages implements Listener {
 
         Group groupToUse = null;
 
-        // We are looping through each config group in the order it is entered in the config
-        // groupToUse will end up being the last group checked that the player has
-        Collection<Group> playerGroups = PlayerData.getGroupsForPlayer(player);
-        for (String configGroup : configGroups.getKeys()) {
-            Group testGroup = PlayerData.getGroup(configGroup);
-            if (testGroup != null && playerGroups.contains(testGroup))
-                groupToUse = testGroup;
+        Collection<String> keys = configGroups.getKeys();
+        for (Group group : PlayerData.getGroupsForPlayer(player)) {
+            // Looping through each group in order from lowest rank to highest, when the loop is finished groupToUse
+            // will be the highest ranking group the player has that is also in the config list
+            if (keys.contains(group.getName()))
+                groupToUse = group;
         }
 
         if (groupToUse == null)
