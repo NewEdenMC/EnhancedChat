@@ -114,7 +114,7 @@ public class Token {
         return true;
     }
 
-    public void setGroupValue(String group, String value) {
+    public boolean setGroupValue(String group, String value) {
         try {
             PreparedStatement st = EnhancedChat.getDB().prepareStatement("INSERT INTO `tokens_groups` (name, " + getMachineName() + ") VALUES (?, ?) ON DUPLICATE KEY UPDATE " + getMachineName() + "=?");
             st.setString(1, group);
@@ -123,9 +123,11 @@ public class Token {
             st.executeUpdate();
         } catch (SQLException e) {
             EnhancedChat.getLogger().log(Level.SEVERE, "An SQL Exception occurred while setting group token '" + getName() + "' to '" + value + "' for group '" + group + "'");
+            return false;
         }
         if (groupsCache.containsKey(group))
             groupsCache.put(group, value);
+        return true;
     }
 
 }
