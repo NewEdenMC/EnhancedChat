@@ -17,7 +17,8 @@ import java.util.UUID;
 
 public class TokenCommands extends Command {
 
-    Token token;
+    private Token token;
+    private enum Type { PLAYER, GROUP }
 
     TokenCommands(Token token, List<String> aliases) {
         super(token.getName(), "enhancedchat.token." + token.getName(), aliases.toArray(new String[0]));
@@ -32,7 +33,7 @@ public class TokenCommands extends Command {
         }
 
         ProxiedPlayer player = (ProxiedPlayer) sender;
-        runCommand(token, sender, player.getUniqueId(), player.getDisplayName(), "/" + getName(), args);
+        runCommand(Type.PLAYER, token, sender, player.getUniqueId(), player.getDisplayName(), "/" + getName(), args);
     }
 
     public static void adminExecute(CommandSender sender, String[] args) {
@@ -43,8 +44,10 @@ public class TokenCommands extends Command {
             return;
         }
 
-        String type = args[2].toLowerCase();
-        if (!type.equals("player") && !type.equals("group")) {
+        Type type;
+        try {
+            type = Type.valueOf(args[2].toUpperCase());
+        } catch (IllegalArgumentException e) {
             sender.sendMessage(new ComponentBuilder("Third argument must be either \"player\" or \"group\":\n" + help).color(ChatColor.GRAY).italic(true).create());
             return;
         }
@@ -56,83 +59,83 @@ public class TokenCommands extends Command {
         }
 
         String[] newValue = Arrays.copyOfRange(args, 4, args.length);
+        String targetName = args[3];
+        UUID targetUUID = null;
 
-        if (type.equals("player")) {
+        if (type == Type.PLAYER) {
             if (!token.isPlayersEnabled()) {
                 sender.sendMessage(new ComponentBuilder("This token does not support values for Players.").color(ChatColor.RED).create()); return;
             }
 
-            String name = args[3];
-            UUID uuid = PlayerData.getUUIDFromName(name);
-            if (uuid == null) {
-                sender.sendMessage(new ComponentBuilder("The player '" + name + "' is not online or hasn't connected before, remember their name is case-sensitive").color(ChatColor.RED).create());
+            targetUUID = PlayerData.getUUIDFromName(targetName);
+            if (targetUUID == null) {
+                sender.sendMessage(new ComponentBuilder("The player '" + targetName + "' is not online or hasn't connected before, remember their name is case-sensitive").color(ChatColor.RED).create());
                 return;
             }
-            String helperCommand = "enhancedchat token " + token.getName() + " " + args[2] + " " + args[3];
-            if (sender instanceof ProxiedPlayer)
-                helperCommand = "/" + helperCommand;
-            runCommand(token, sender, uuid, name, helperCommand, newValue);
-            return;
-        }
-
-        if (type.equals("group")) {
+        } else if (type == Type.GROUP) {
             if (!token.isGroupsEnabled()) {
                 sender.sendMessage(new ComponentBuilder("This token does not support values for Groups.").color(ChatColor.RED).create()); return;
             }
-            // todo: add group support
-        }
+        } else return;
+
+        String helperCommand = "enhancedchat token " + token.getName() + " " + args[2] + " " + args[3];
+        if (sender instanceof ProxiedPlayer)
+            helperCommand = "/" + helperCommand;
+
+        runCommand(type, token, sender, targetUUID, targetName, helperCommand, newValue);
     }
 
-    private static void runCommand(Token token, CommandSender sender, UUID target, String targetName, String helperCommand, String... value) {
-        boolean self = sender instanceof ProxiedPlayer && ((ProxiedPlayer) sender).getUniqueId().equals(target);
-        String nameWS = targetName + " ";
-        String qNameWS = targetName + "'s ";
+    private static void runCommand(Type type, Token token, CommandSender sender, UUID target, String targetName, String helperCommand, String... value) {
+        boolean senderIsSelf = type == Type.PLAYER && sender instanceof ProxiedPlayer && ((ProxiedPlayer) sender).getUniqueId().equals(target);
+        String subjectText = (type == Type.PLAYER ? "player '" : "group '") + targetName + "'";
         StringEval currentValue = token.getValue(target);
-        ComponentBuilder removeHelp = new ComponentBuilder("To remove " + (self ? "your" : qNameWS) + token.getLabel() + " use: " + helperCommand + " off").color(ChatColor.GRAY).italic(true);
+
+        String removeHelpSelf =  "To remove your " + token.getLabel() + " use " + helperCommand + " off";
+        String removeHelpOther = "To remove " + token.getLabel() + " for " + subjectText + " use " + helperCommand + " off";
+        ComponentBuilder removeHelp = new ComponentBuilder(senderIsSelf ? removeHelpSelf : removeHelpOther).color(ChatColor.GRAY).italic(true);
 
         if (value.length <= 0) {
-            String state;
-            if (currentValue == null) {
-                sender.sendMessage(new ComponentBuilder((self ? "You do" : nameWS + "does") + " not currently have a " + token.getLabel() + " set.").color(ChatColor.AQUA).create());
-                state = "set";
-            } else {
-                TextComponent current = new TextComponent(currentValue.getTextComponent());
-                current.setColor(ChatColor.YELLOW);
-                TextComponent message = new TextComponent((self ? "Your " : qNameWS) + "current " + token.getLabel() + " is: ");
-                message.setColor(ChatColor.AQUA);
-                message.addExtra(current);
-                sender.sendMessage(message);
-                state = "change";
-            }
-            sender.sendMessage(new ComponentBuilder("To " + state + (self ? " your " : " " + qNameWS) + token.getLabel() + " run this command again followed by the " + token.getLabel() + " you want to use").color(ChatColor.AQUA).create());
-            if (state.equals("change"))
-                sender.sendMessage(removeHelp.create());
-            return;
+            noArgs(sender, token, currentValue, subjectText, senderIsSelf, removeHelp); return;
         }
 
+        String newValue = buildValue(value);
         String action;
         boolean success;
+        String setValue;
+
         if (value[0].equalsIgnoreCase("off") || value[0].equalsIgnoreCase("remove")) {
-            success = token.setPlayerValue(target, null);
+            setValue = null;
             action = "remove";
         } else {
-            success = buildSetToken(token, target, value);
+            setValue = newValue;
             action = "set";
         }
+
+        if (type == Type.PLAYER)
+            success = token.setPlayerValue(target, setValue);
+        else
+            success = token.setGroupValue(targetName, setValue);
+
+        String setFailedSelf  = "Failed to " + action + " your " + token.getLabel() + ", please contact a member of staff.";
+        String setFailedOther = "Failed to " + action + " the " + token.getLabel() + " for " + subjectText + ", please contact a member of staff.";
+
         if (!success) {
-            sender.sendMessage(new ComponentBuilder("Failed to " + action + (self ? " your " : " " + qNameWS) + token.getLabel() + ", please contact a member of staff.").color(ChatColor.RED).create());
+            sender.sendMessage(new ComponentBuilder(senderIsSelf ? setFailedSelf : setFailedOther).color(ChatColor.RED).create());
             return;
         }
+
+        String removeSelf  = "Your " + token.getLabel() + " has been removed.";
+        String removeOther = "The " + token.getLabel() + " for " + subjectText + " has been removed.";
 
         if (action.equals("remove")) {
-            sender.sendMessage(new ComponentBuilder((self ? "Your " : qNameWS) + token.getLabel() + "has been removed.").color(ChatColor.BLUE).create());
+            sender.sendMessage(new ComponentBuilder(senderIsSelf ? removeSelf : removeOther).color(ChatColor.BLUE).create());
             return;
         }
 
-        TextComponent newValue = new TextComponent(token.getValue(target).getTextComponent());
-        newValue.setColor(ChatColor.YELLOW);
+        TextComponent tcValue = new TextComponent(new StringEval(newValue).getTextComponent());
+        tcValue.setColor(ChatColor.YELLOW);
 
-        TextComponent message = new TextComponent((self ? "Your " : qNameWS) + token.getLabel());
+        TextComponent message = new TextComponent(senderIsSelf ? "Your " + token.getLabel() : "The " + token.getLabel() + " for " + subjectText);
         if (currentValue != null) {
             TextComponent old = new TextComponent(currentValue.getTextComponent());
             old.setColor(ChatColor.YELLOW);
@@ -142,19 +145,49 @@ public class TokenCommands extends Command {
         } else {
             message.addExtra(" has been set to ");
         }
-        message.addExtra(newValue);
+        message.addExtra(tcValue);
         message.setColor(ChatColor.AQUA);
         sender.sendMessage(message);
         sender.sendMessage(removeHelp.create());
     }
 
-    private static boolean buildSetToken(Token token, UUID uuid, String[] args) {
+    private static void noArgs(CommandSender sender, Token token, StringEval currentValue, String subjectText, boolean senderIsSelf, ComponentBuilder removeHelp) {
+        String state;
+
+        String noValSelf  = "You do not have a " + token.getLabel() + " set";
+        String noValOther = "There is not currently a " + token.getLabel() + " set for " + subjectText;
+
+        String currentValSelf  = "Your current " + token.getLabel() + " is ";
+        String currentValOther = "The current " + token.getLabel() + " for " + subjectText + " is ";
+
+        if (currentValue == null) {
+            sender.sendMessage(new ComponentBuilder(senderIsSelf ? noValSelf : noValOther).color(ChatColor.AQUA).create());
+            state = "set";
+        } else {
+            TextComponent current = new TextComponent(currentValue.getTextComponent());
+            current.setColor(ChatColor.YELLOW);
+            TextComponent message = new TextComponent(senderIsSelf ? currentValSelf : currentValOther);
+            message.setColor(ChatColor.AQUA);
+            message.addExtra(current);
+            sender.sendMessage(message);
+            state = "change";
+        }
+
+        String setSelf  = "To " + state + " your " + token.getLabel() + " run this command again followed by the " + token.getLabel() + " you want to use";
+        String setOther = "To " + state + " the " + token.getLabel() + " for " + subjectText + " run this command again followed by the " + token.getLabel() + " you want to use";
+
+        sender.sendMessage(new ComponentBuilder(senderIsSelf ? setSelf : setOther).color(ChatColor.AQUA).create());
+        if (state.equals("change"))
+            sender.sendMessage(removeHelp.create());
+    }
+
+    private static String buildValue(String[] args) {
         StringBuilder valueSB = new StringBuilder();
         for (int i = 0; i < args.length; i++) {
             valueSB.append(args[i]);
             if (args.length - 1 != i) valueSB.append(' ');
         }
-        return token.setPlayerValue(uuid, valueSB.toString());
+        return valueSB.toString();
     }
 
 }
