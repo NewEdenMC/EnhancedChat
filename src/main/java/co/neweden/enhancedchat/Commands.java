@@ -35,15 +35,15 @@ public class Commands extends Command {
     private static void help(CommandSender sender) {
         sender.sendMessage(new ComponentBuilder("Enhanced Chat Admin Sub-Commands:").color(ChatColor.WHITE).create());
 
-        String[] cmd = new String[5];
-        String[] desc = new String[5];
+        String[] cmd = new String[6];
+        String[] desc = new String[6];
 
         cmd[0] = "reload"; desc[0] = "Reload the configuration and clear the cache";
         cmd[1] = "token [TOKEN-NAME] player [PLAYER-NAME]"; desc[1] = "Get or set the Custom Token for the given Player";
         cmd[2] = "token [TOKEN-NAME] group [GROUP-NAME]"; desc[2] = "Get or set the Custom Token for the given Group";
         cmd[3] = "groups"; desc[3] = "List groups";
         cmd[4] = "groups player [PLAYER-NAME]"; desc[4] = "Show which groups a player is a member of";
-        cmd[4] = "groups rebuildcache"; desc[4] = "Rebuilds the cached data that stores which groups players are members of";
+        cmd[5] = "groups rebuildcache"; desc[5] = "Rebuilds the cached data that stores which groups players are members of";
 
         for (int i = 0; i < cmd.length; i++) {
             sender.sendMessage(
