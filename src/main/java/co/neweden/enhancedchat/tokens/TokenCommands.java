@@ -1,6 +1,7 @@
 package co.neweden.enhancedchat.tokens;
 
 import co.neweden.enhancedchat.EnhancedChat;
+import co.neweden.enhancedchat.playerdata.Group;
 import co.neweden.enhancedchat.playerdata.PlayerData;
 import co.neweden.enhancedchat.StringEval;
 import net.md_5.bungee.api.ChatColor;
@@ -33,7 +34,7 @@ public class TokenCommands extends Command {
         }
 
         ProxiedPlayer player = (ProxiedPlayer) sender;
-        runCommand(Type.PLAYER, token, sender, player.getUniqueId(), player.getDisplayName(), "/" + getName(), args);
+        runCommand(Type.PLAYER, token, sender, player.getUniqueId(), player.getDisplayName(), null, "/" + getName(), args);
     }
 
     public static void adminExecute(CommandSender sender, String[] args) {
@@ -61,6 +62,7 @@ public class TokenCommands extends Command {
         String[] newValue = Arrays.copyOfRange(args, 4, args.length);
         String targetName = args[3];
         UUID targetUUID = null;
+        Group targetGroup = null;
 
         if (type == Type.PLAYER) {
             if (!token.isPlayersEnabled()) {
@@ -76,19 +78,31 @@ public class TokenCommands extends Command {
             if (!token.isGroupsEnabled()) {
                 sender.sendMessage(new ComponentBuilder("This token does not support values for Groups.").color(ChatColor.RED).create()); return;
             }
+
+            targetGroup = PlayerData.getGroup(targetName);
+            if (targetGroup == null) {
+                sender.sendMessage(new ComponentBuilder("The group name '" + targetName + "' does not exist, to get a list of groups run: enhancedchat groups").color(ChatColor.RED).create());
+                return;
+            }
         } else return;
 
         String helperCommand = "enhancedchat token " + token.getName() + " " + args[2] + " " + args[3];
         if (sender instanceof ProxiedPlayer)
             helperCommand = "/" + helperCommand;
 
-        runCommand(type, token, sender, targetUUID, targetName, helperCommand, newValue);
+        runCommand(type, token, sender, targetUUID, targetName, targetGroup, helperCommand, newValue);
     }
 
-    private static void runCommand(Type type, Token token, CommandSender sender, UUID target, String targetName, String helperCommand, String... value) {
-        boolean senderIsSelf = type == Type.PLAYER && sender instanceof ProxiedPlayer && ((ProxiedPlayer) sender).getUniqueId().equals(target);
+    private static void runCommand(Type type, Token token, CommandSender sender, UUID targetUUID, String targetName, Group targetGroup, String helperCommand, String... value) {
+        boolean senderIsSelf = false;
         String subjectText = (type == Type.PLAYER ? "player '" : "group '") + targetName + "'";
-        StringEval currentValue = token.getValue(target);
+        StringEval currentValue;
+
+        if (type == Type.PLAYER) {
+            senderIsSelf = sender instanceof ProxiedPlayer && ((ProxiedPlayer) sender).getUniqueId().equals(targetUUID);
+            currentValue = token.getValue(targetUUID);
+        } else
+            currentValue = token.getValueForGroup(targetGroup);
 
         String removeHelpSelf =  "To remove your " + token.getLabel() + " use " + helperCommand + " off";
         String removeHelpOther = "To remove " + token.getLabel() + " for " + subjectText + " use " + helperCommand + " off";
@@ -112,9 +126,9 @@ public class TokenCommands extends Command {
         }
 
         if (type == Type.PLAYER)
-            success = token.setPlayerValue(target, setValue);
+            success = token.setPlayerValue(targetUUID, setValue);
         else
-            success = token.setGroupValue(targetName, setValue);
+            success = token.setGroupValue(targetGroup, setValue);
 
         String setFailedSelf  = "Failed to " + action + " your " + token.getLabel() + ", please contact a member of staff.";
         String setFailedOther = "Failed to " + action + " the " + token.getLabel() + " for " + subjectText + ", please contact a member of staff.";

@@ -1,8 +1,12 @@
 package co.neweden.enhancedchat.tokens;
 
 import co.neweden.enhancedchat.EnhancedChat;
+import co.neweden.enhancedchat.StringEval;
+import co.neweden.enhancedchat.playerdata.Group;
+import co.neweden.enhancedchat.playerdata.PlayerData;
 import net.md_5.bungee.config.Configuration;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
@@ -44,13 +48,31 @@ public class CustomTokens {
                     continue;
                 }
             }
-            try {
-                if (groupsEnabled)
+            if (groupsEnabled) {
+                try {
                     EnhancedChat.getDB().createStatement().execute("ALTER TABLE `tokens_groups` ADD COLUMN `" + token.getMachineName() + "` VARCHAR(45) NULL;");
-            } catch (SQLException e) {
-                if (!e.getSQLState().equals("42S21")) {
-                    EnhancedChat.getLogger().log(Level.SEVERE, "An SQL Exception occurred while trying to add the Groups Token Column ('" + token.getMachineName() + "' in table 'tokens_groups') for Token '" + token.getName() + "'", e);
-                    continue;
+                } catch (SQLException e) {
+                    if (!e.getSQLState().equals("42S21")) {
+                        EnhancedChat.getLogger().log(Level.SEVERE, "An SQL Exception occurred while trying to add the Groups Token Column ('" + token.getMachineName() + "' in table 'tokens_groups') for Token '" + token.getName() + "'", e);
+                        continue;
+                    }
+                }
+
+                // For the current token get all of the group values stored in the database and cache them
+                try {
+                    ResultSet rs = EnhancedChat.getDB().createStatement().executeQuery("SELECT name," + token.getMachineName() + " FROM `tokens_groups`;");
+                    while (rs.next()) {
+                        String value = rs.getString(2);
+                        if (value == null) continue;
+                        Group group = PlayerData.getGroup(rs.getString(1));
+                        if (group == null) {
+                            EnhancedChat.getLogger().warning("While loading group data from Database T able 'tokens_groups' found the group '" + rs.getString(1) + "' however this group does not exist so this record will be skipped.");
+                            return;
+                        }
+                        token.groupValues.put(group, new StringEval(value));
+                    }
+                } catch (SQLException e) {
+                    EnhancedChat.getLogger().log(Level.SEVERE, "An SQL Exception occurred while trying to load data for token '" + token.getMachineName() + "' from 'token_groups' table.", e);
                 }
             }
 

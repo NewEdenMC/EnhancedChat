@@ -63,13 +63,14 @@ public class Main extends Plugin {
         } catch (IOException e) {
             getLogger().log(Level.SEVERE, e.getMessage(), e);
         }
+        new PlayerData();
         if (config.getBoolean("custom_tokens.enabled", false)) {
             if (loadDBConnection())
                 new CustomTokens();
             else
                 getLogger().warning("Custom Tokens will not be enabled as a Database Connection could not be established.");
         }
-        new PlayerData(); new Messages(); new Commands(); new ChatManager();
+        new Messages(); new Commands(); new ChatManager();
         loadDynamicCommands();
         EnhancedChat.startUpLoad = false;
     }
