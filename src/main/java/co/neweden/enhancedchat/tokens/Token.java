@@ -68,11 +68,10 @@ public class Token {
 
         if (isGroupsEnabled() && player != null) {
             Collection<Group> playerGroups = PlayerData.getGroupsForPlayer(player);
-            Set<Group> groups = groupValues.keySet();
             // Loop through each group the player has, ordered by rank, so that the last group that matches will be
             // the player's highest group
             for (Group playerGroup : playerGroups) {
-                if (groups.contains(playerGroup))
+                if (groupValues.get(playerGroup) != null)
                     group = playerGroup;
             }
         }
