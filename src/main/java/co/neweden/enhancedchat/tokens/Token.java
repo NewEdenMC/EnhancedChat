@@ -136,7 +136,7 @@ public class Token {
             EnhancedChat.getLogger().log(Level.SEVERE, "An SQL Exception occurred while setting group token '" + getName() + "' to '" + value + "' for group '" + group + "'");
             return false;
         }
-        groupValues.put(group, value == null ? null : new StringEval(value));
+        groupValues.put(group, new StringEval(value));
         return true;
     }
 
